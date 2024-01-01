@@ -1,12 +1,12 @@
-package focusing.service;
+package springboot.focusing.service;
 
-import focusing.domain.UserSession;
 import jakarta.annotation.PreDestroy;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.socket.WebSocketSession;
+import springboot.focusing.domain.UserSession;
 
 import java.io.Closeable;
 import java.util.concurrent.ConcurrentHashMap;

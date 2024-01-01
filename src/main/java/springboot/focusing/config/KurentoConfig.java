@@ -1,7 +1,5 @@
-package focusing.config;
+package springboot.focusing.config;
 
-import focusing.controller.handler.ConnectHandler;
-import focusing.service.UserRegistry;
 import lombok.RequiredArgsConstructor;
 import org.kurento.client.KurentoClient;
 import org.kurento.jsonrpc.client.JsonRpcClientNettyWebSocket;
@@ -12,6 +10,8 @@ import org.springframework.web.socket.config.annotation.EnableWebSocket;
 import org.springframework.web.socket.config.annotation.WebSocketConfigurer;
 import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry;
 import org.springframework.web.socket.server.standard.ServletServerContainerFactoryBean;
+import springboot.focusing.controller.handler.ConnectHandler;
+import springboot.focusing.service.UserRegistry;
 
 import java.util.Objects;
 

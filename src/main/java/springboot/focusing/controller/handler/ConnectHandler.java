@@ -1,10 +1,8 @@
-package focusing.controller.handler;
+package springboot.focusing.controller.handler;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
-import focusing.domain.UserSession;
-import focusing.service.UserRegistry;
 import lombok.RequiredArgsConstructor;
 import org.kurento.client.IceCandidate;
 import org.kurento.client.KurentoClient;
@@ -15,6 +13,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
+import springboot.focusing.domain.UserSession;
+import springboot.focusing.service.UserRegistry;
 
 import java.io.IOException;
 

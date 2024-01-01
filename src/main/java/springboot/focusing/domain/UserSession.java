@@ -1,4 +1,4 @@
-package focusing.domain;
+package springboot.focusing.domain;
 
 import com.google.gson.JsonObject;
 import org.kurento.client.IceCandidate;
