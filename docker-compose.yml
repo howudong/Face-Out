@@ -1,9 +1,9 @@
-version: '3'
+version: '3.7'
 services:
   kurento:
     image: kurento/kurento-media-server:7.0.0
     volumes:
-      - ${HOME}/focusing/volume/kurento:/volume/container
+      - $HOME/focusing/volume/kurento:/data
     ports:
       - "8888:8888"
       - "8443:8443"
@@ -11,10 +11,7 @@ services:
   nginx:
     image: nginx:latest
     volumes:
-      - ${HOME}/focusing/volume/nginx:/volume/container
+      - $HOME/focusing/volume/nginx:/data
     ports:
       - "80:80"
       - "443:443"
-volumes:
-  kurento:
-  nginx:
