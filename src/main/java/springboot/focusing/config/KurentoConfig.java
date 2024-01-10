@@ -10,9 +10,16 @@ import org.springframework.web.socket.config.annotation.EnableWebSocket;
 import org.springframework.web.socket.config.annotation.WebSocketConfigurer;
 import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry;
 import org.springframework.web.socket.server.standard.ServletServerContainerFactoryBean;
-import springboot.focusing.controller.handler.ConnectHandler;
+import springboot.focusing.KurentoHandlerAdapter;
+import springboot.focusing.handler.KurentoHandler;
+import springboot.focusing.handler.KurentoICEHandler;
+import springboot.focusing.handler.KurentoJoinHandler;
+import springboot.focusing.handler.KurentoMainHandler;
 import springboot.focusing.service.UserRegistry;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 @Configuration
@@ -26,8 +33,8 @@ public class KurentoConfig implements WebSocketConfigurer {
     private String kmsUrl;
 
     @Bean
-    public ConnectHandler createKurentoHandler() {
-        return new ConnectHandler(userRegistry);
+    public KurentoMainHandler createKurentoHandler() {
+        return new KurentoMainHandler(configKurentoHandler());
     }
 
     // Kurento Media Server 를 사용하기 위한 Bean 설정
@@ -46,7 +53,6 @@ public class KurentoConfig implements WebSocketConfigurer {
     private KurentoClient createKurentoClient(String url) {
         JsonRpcClientNettyWebSocket webSocket = new JsonRpcClientNettyWebSocket(url);
         return KurentoClient.createFromJsonRpcClient(webSocket);
-
     }
 
     // 웹 소켓에서 rtc 통신을 위한 최대 텍스트 버퍼와 바이너리 버퍼 사이즈를 설정
@@ -56,6 +62,14 @@ public class KurentoConfig implements WebSocketConfigurer {
         container.setMaxTextMessageBufferSize(32768);
         container.setMaxBinaryMessageBufferSize(32768);
         return container;
+    }
+
+    private KurentoHandlerAdapter configKurentoHandler() {
+        Map<String, KurentoHandler> handlerMap = new HashMap<>();
+        handlerMap.put("join", new KurentoJoinHandler(new UserRegistry(), kurentoClient()));
+        handlerMap.put("onIceCandidate", new KurentoICEHandler());
+
+        return new KurentoHandlerAdapter(Collections.unmodifiableMap(handlerMap));
     }
 
     // signal 로 요청이 왔을 때 아래의 WebSockerHandler 가 동작하도록 registry 에 설정
