@@ -44,6 +44,12 @@ public class UserRegistry implements Closeable {
                 .toList();
     }
 
+    public void removeBySession(WebSocketSession session) {
+        UserSession removeSession = findBySession(session);
+        userByName.remove(removeSession.getName());
+        userBySessionId.remove(session.getId());
+    }
+
     @Override
     public void close() {
         for (final UserSession user : userBySessionId.values()) {
@@ -54,11 +60,5 @@ public class UserRegistry implements Closeable {
     @PreDestroy
     private void shutdown() {
         this.close();
-    }
-
-    public void removeBySession(WebSocketSession session) {
-        UserSession removeSession = findBySession(session);
-        userByName.remove(removeSession.getName());
-        userBySessionId.remove(session.getId());
     }
 }

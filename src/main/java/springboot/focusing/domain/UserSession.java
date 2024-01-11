@@ -49,7 +49,7 @@ public class UserSession implements Closeable {
     }
 
     public void sendMessage(JsonObject message) throws IOException {
-        log.debug("USER {}: Sending message {}", name, message);
+        log.info("USER {}: Sending message {}", name, message);
         synchronized (session) {
             session.sendMessage(new TextMessage(message.toString()));
         }
@@ -82,7 +82,7 @@ public class UserSession implements Closeable {
     }
 
     public void receiveVideoFrom(UserSession sender, String sdpOffer) throws IOException {
-        log.trace("USER {}: SdpOffer for {} is {}", this.name, sender.getName(), sdpOffer);
+        log.info("USER {}: SdpOffer for {} is {}", this.name, sender.getName(), sdpOffer);
 
         final String ipSdpAnswer = this.getEndpointForUser(sender).processOffer(sdpOffer);
         final JsonObject scParams = new JsonObject();
@@ -90,23 +90,23 @@ public class UserSession implements Closeable {
         scParams.addProperty("name", sender.getName());
         scParams.addProperty("sdpAnswer", ipSdpAnswer);
 
-        log.trace("USER {}: SdpAnswer for {} is {}", this.name, sender.getName(), ipSdpAnswer);
+        log.info("USER {}: SdpAnswer for {} is {}", this.name, sender.getName(), ipSdpAnswer);
         this.sendMessage(scParams);
-        log.debug("gather candidates");
+        log.info("gather candidates");
         this.getEndpointForUser(sender).gatherCandidates();
     }
 
     private WebRtcEndpoint getEndpointForUser(final UserSession sender) {
         if (sender.getName().equals(name)) {
-            log.debug("PARTICIPANT {}: configuring loopback", this.name);
+            log.info("PARTICIPANT {}: configuring loopback", this.name);
             return outgoingMedia;
         }
 
-        log.debug("PARTICIPANT {}: receiving video from {}", this.name, sender.getName());
+        log.info("PARTICIPANT {}: receiving video from {}", this.name, sender.getName());
 
         WebRtcEndpoint incoming = incomingMedia.get(sender.getName());
         if (incoming == null) {
-            log.debug("PARTICIPANT {}: creating new endpoint for {}", this.name, sender.getName());
+            log.info("PARTICIPANT {}: creating new endpoint for {}", this.name, sender.getName());
             incoming = new WebRtcEndpoint.Builder(mediaPipeline).build();
 
             incoming.addIceCandidateFoundListener(event -> {
@@ -126,7 +126,7 @@ public class UserSession implements Closeable {
             incomingMedia.put(sender.getName(), incoming);
         }
 
-        log.debug("PARTICIPANT {}: obtained endpoint for {}", this.name, sender.getName());
+        log.info("PARTICIPANT {}: obtained endpoint for {}", this.name, sender.getName());
         sender.connectPeer(incoming);
         return incoming;
     }

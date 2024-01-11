@@ -60,7 +60,7 @@ public class JoinHandler extends TextWebSocketHandler implements KurentoHandler 
                 }
                 participant.sendMessage(newParticipantMsg);
             } catch (final IOException e) {
-                log.debug("ROOM {}: participant {} could not be notified",
+                log.info("ROOM {}: participant {} could not be notified",
                         newParticipant.getName(),
                         participant.getName(), e);
             }
@@ -79,7 +79,7 @@ public class JoinHandler extends TextWebSocketHandler implements KurentoHandler 
         final JsonObject existingParticipantsMsg = new JsonObject();
         existingParticipantsMsg.addProperty("id", "existingParticipants");
         existingParticipantsMsg.add("data", participantsArray);
-        log.debug("PARTICIPANT {}: sending a list of {} participants", user.getName(),
+        log.info("PARTICIPANT {}: sending a list of {} participants", user.getName(),
                 participantsArray.size());
         try {
             user.sendMessage(existingParticipantsMsg);
