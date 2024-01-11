@@ -21,17 +21,39 @@ public class UserSession implements Closeable {
     private static final Logger log = LoggerFactory.getLogger(UserSession.class);
     private final MediaPipeline mediaPipeline;
     private final WebSocketSession session;
+    private final String name;
     private final Map<String, WebRtcEndpoint> incomingMedia = new ConcurrentHashMap<>();
     private final WebRtcEndpoint outgoingMedia;
 
-    public UserSession(MediaPipeline mediaPipeline, WebSocketSession session) {
+    public UserSession(MediaPipeline mediaPipeline, WebSocketSession session, String name) {
         this.mediaPipeline = mediaPipeline;
         this.session = session;
+        this.name = name;
         this.outgoingMedia = new WebRtcEndpoint.Builder(mediaPipeline)
                 .useDataChannels()
                 .build();
         this.outgoingMedia.addIceCandidateFoundListener(this::makeIceJson);
 
+    }
+
+    public void release() {
+        this.mediaPipeline.release();
+    }
+
+    public void addCandidate(IceCandidate candidate, String sessionId) {
+        if ((this.session.getId()).equals(sessionId)) {
+            outgoingMedia.addIceCandidate(candidate);
+            return;
+        }
+        WebRtcEndpoint webRtc = incomingMedia.get(sessionId);
+        if (webRtc != null) {
+            webRtc.addIceCandidate(candidate);
+        }
+    }
+
+    @Override
+    public void close() throws IOException {
+        release();
     }
 
     private void makeIceJson(IceCandidateFoundEvent event) {
@@ -44,26 +66,6 @@ public class UserSession implements Closeable {
             }
         } catch (IOException e) {
             log.debug(e.getMessage());
-        }
-    }
-
-    public void release() {
-        this.mediaPipeline.release();
-    }
-
-    @Override
-    public void close() throws IOException {
-        release();
-    }
-
-    public void addCandidate(IceCandidate candidate, String sessionId) {
-        if ((this.session.getId()).equals(sessionId)) {
-            outgoingMedia.addIceCandidate(candidate);
-            return;
-        }
-        WebRtcEndpoint webRtc = incomingMedia.get(sessionId);
-        if (webRtc != null) {
-            webRtc.addIceCandidate(candidate);
         }
     }
 }
