@@ -15,25 +15,27 @@ import java.util.concurrent.ConcurrentHashMap;
 @Service
 public class UserRegistry implements Closeable {
     private static final Logger log = LoggerFactory.getLogger(UserRegistry.class);
-    private final ConcurrentHashMap<String, UserSession> users = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, UserSession> userBySessionId = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, UserSession> userByName = new ConcurrentHashMap<>();
+
 
     public void register(String id, UserSession userSession) {
         System.out.println("register UserSession");
         log.info("register UserSession");
-        users.put(id, userSession);
+        userBySessionId.put(id, userSession);
     }
 
-    public UserSession findBySessionId(String sessionId) {
-        return users.get(sessionId);
+    public UserSession findBySessionId(WebSocketSession session) {
+        return userBySessionId.get(session.getId());
     }
 
     public boolean isExist(String sessionId) {
-        return users.containsKey(sessionId);
+        return userBySessionId.containsKey(sessionId);
     }
 
     @Override
     public void close() {
-        for (final UserSession user : users.values()) {
+        for (final UserSession user : userBySessionId.values()) {
             shutdown();
         }
     }
@@ -44,6 +46,6 @@ public class UserRegistry implements Closeable {
     }
 
     public void removeBySession(WebSocketSession session) {
-        users.remove(session.getId());
+        userBySessionId.remove(session.getId());
     }
 }
