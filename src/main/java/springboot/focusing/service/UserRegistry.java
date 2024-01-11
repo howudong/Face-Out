@@ -26,7 +26,7 @@ public class UserRegistry implements Closeable {
         userByName.put(userSession.getName(), userSession);
     }
 
-    public UserSession findBySessionId(WebSocketSession session) {
+    public UserSession findBySession(WebSocketSession session) {
         return userBySessionId.get(session.getId());
     }
 
@@ -57,6 +57,8 @@ public class UserRegistry implements Closeable {
     }
 
     public void removeBySession(WebSocketSession session) {
+        UserSession removeSession = findBySession(session);
+        userByName.remove(removeSession.getName());
         userBySessionId.remove(session.getId());
     }
 }
