@@ -13,19 +13,16 @@ import springboot.focusing.KurentoHandlerAdapter;
 import java.io.IOException;
 import java.util.Optional;
 
-public class KurentoMainHandler extends TextWebSocketHandler {
-    private static final Logger log = LoggerFactory.getLogger(KurentoMainHandler.class);
+public class MainHandler extends TextWebSocketHandler {
+    private static final Logger log = LoggerFactory.getLogger(MainHandler.class);
     private static final Gson gson = new GsonBuilder().create();
 
-    //private final UserRegistry registry;
-    //private final KurentoClient kurentoClient;
     private final KurentoHandlerAdapter kurentoHandlerAdapter;
 
-    public KurentoMainHandler(KurentoHandlerAdapter kurentoHandlerAdapter) {
+    public MainHandler(KurentoHandlerAdapter kurentoHandlerAdapter) {
         this.kurentoHandlerAdapter = kurentoHandlerAdapter;
     }
-
-
+    
     @Override
     public void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
         JsonObject jsonMessage = gson.fromJson(message.getPayload(), JsonObject.class);
@@ -39,17 +36,6 @@ public class KurentoMainHandler extends TextWebSocketHandler {
         kurentoHandler.get().process(session, jsonMessage);
     }
 
-    //            case "onIceCandidate": {
-//                JsonObject jsonCandidate = jsonMessage.get("candidate").getAsJsonObject();
-//                if (user != null) {
-//                    IceCandidate candidate = new IceCandidate(jsonCandidate.get("candidate").getAsString(),
-//                            jsonCandidate.get("sdpMid").getAsString(),
-//                            jsonCandidate.get("sdpMLineIndex").getAsInt());
-//                    user.addCandidate(candidate, session.getId());
-//                }
-//                break;
-//            }
-//        }
     private void sendError(WebSocketSession session, String message) {
         try {
             JsonObject response = new JsonObject();
