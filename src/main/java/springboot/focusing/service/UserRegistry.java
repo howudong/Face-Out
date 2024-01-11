@@ -9,6 +9,7 @@ import org.springframework.web.socket.WebSocketSession;
 import springboot.focusing.domain.UserSession;
 
 import java.io.Closeable;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 @RequiredArgsConstructor
@@ -20,9 +21,9 @@ public class UserRegistry implements Closeable {
 
 
     public void register(String id, UserSession userSession) {
-        System.out.println("register UserSession");
         log.info("register UserSession");
         userBySessionId.put(id, userSession);
+        userByName.put(userSession.getName(), userSession);
     }
 
     public UserSession findBySessionId(WebSocketSession session) {
@@ -31,6 +32,12 @@ public class UserRegistry implements Closeable {
 
     public boolean isExist(String sessionId) {
         return userBySessionId.containsKey(sessionId);
+    }
+
+    public List<UserSession> getAllSession() {
+        return userByName.values()
+                .stream()
+                .toList();
     }
 
     @Override
