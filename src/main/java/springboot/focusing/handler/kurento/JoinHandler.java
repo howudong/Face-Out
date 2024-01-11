@@ -28,7 +28,6 @@ public class JoinHandler extends TextWebSocketHandler implements KurentoHandler 
         registry.register(session.getId(), user);
         notifyOthers(user);
         sendParticipantNames(user);
-
     }
 
 
@@ -56,6 +55,9 @@ public class JoinHandler extends TextWebSocketHandler implements KurentoHandler 
 
         for (final UserSession participant : registry.getAllSession()) {
             try {
+                if (!participant.getName().equals(newParticipant.getName())) {
+                    continue;
+                }
                 participant.sendMessage(newParticipantMsg);
             } catch (final IOException e) {
                 log.debug("ROOM {}: participant {} could not be notified",

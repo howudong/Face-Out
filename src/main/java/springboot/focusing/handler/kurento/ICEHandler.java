@@ -17,12 +17,13 @@ public class ICEHandler implements KurentoHandler {
     @Override
     public void process(WebSocketSession session, JsonObject jsonMessage) {
         JsonObject jsonCandidate = jsonMessage.get("candidate").getAsJsonObject();
-        UserSession user = registry.findBySessionId(session);
+        String name = jsonMessage.get("name").getAsString();
+        UserSession user = registry.findBySession(session);
         if (user != null) {
             IceCandidate candidate = new IceCandidate(jsonCandidate.get("candidate").getAsString(),
                     jsonCandidate.get("sdpMid").getAsString(),
                     jsonCandidate.get("sdpMLineIndex").getAsInt());
-            user.addCandidate(candidate, session.getId());
+            user.addCandidate(candidate, name);
         }
     }
 
