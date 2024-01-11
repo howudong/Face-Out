@@ -55,7 +55,8 @@ public class JoinHandler extends TextWebSocketHandler implements KurentoHandler 
 
         for (final UserSession participant : registry.getAllSession()) {
             try {
-                if (!participant.getName().equals(newParticipant.getName())) {
+                if (participant.getName().equals(newParticipant.getName())) {
+                    log.info("same participant {}", participant.getName());
                     continue;
                 }
                 participant.sendMessage(newParticipantMsg);
