@@ -22,7 +22,7 @@ public class MainHandler extends TextWebSocketHandler {
     public MainHandler(KurentoHandlerAdapter kurentoHandlerAdapter) {
         this.kurentoHandlerAdapter = kurentoHandlerAdapter;
     }
-    
+
     @Override
     public void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
         JsonObject jsonMessage = gson.fromJson(message.getPayload(), JsonObject.class);
@@ -35,6 +35,7 @@ public class MainHandler extends TextWebSocketHandler {
         }
         kurentoHandler.get().process(session, jsonMessage);
     }
+
 
     private void sendError(WebSocketSession session, String message) {
         try {

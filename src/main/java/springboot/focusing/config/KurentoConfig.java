@@ -12,9 +12,9 @@ import org.springframework.web.socket.server.standard.ServletServerContainerFact
 import springboot.focusing.KurentoHandlerAdapter;
 import springboot.focusing.handler.KurentoHandler;
 import springboot.focusing.handler.MainHandler;
-import springboot.focusing.handler.ReceiveVideoHandler;
 import springboot.focusing.handler.kurento.ICEHandler;
 import springboot.focusing.handler.kurento.JoinHandler;
+import springboot.focusing.handler.kurento.ReceiveVideoHandler;
 import springboot.focusing.service.UserRegistry;
 
 import java.util.Collections;

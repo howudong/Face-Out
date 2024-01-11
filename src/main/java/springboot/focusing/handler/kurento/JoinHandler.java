@@ -1,6 +1,9 @@
 package springboot.focusing.handler.kurento;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.kurento.client.KurentoClient;
@@ -24,6 +27,7 @@ public class JoinHandler extends TextWebSocketHandler implements KurentoHandler 
         UserSession user = createUserSession(session, jsonMessage);
         registry.register(session.getId(), user);
         notifyOthers(user);
+        sendParticipantNames(user);
 
     }
 
@@ -59,5 +63,26 @@ public class JoinHandler extends TextWebSocketHandler implements KurentoHandler 
                         participant.getName(), e);
             }
         }
+    }
+
+    private void sendParticipantNames(UserSession user) {
+        final JsonArray participantsArray = new JsonArray();
+        for (final UserSession participant : registry.getAllSession()) {
+            if (!participant.getName().equals(user.getName())) {
+                final JsonElement participantName = new JsonPrimitive(participant.getName());
+                participantsArray.add(participantName);
+            }
+        }
+
+        final JsonObject existingParticipantsMsg = new JsonObject();
+        existingParticipantsMsg.addProperty("id", "existingParticipants");
+        existingParticipantsMsg.add("data", participantsArray);
+        log.debug("PARTICIPANT {}: sending a list of {} participants", user.getName(),
+                participantsArray.size());
+        try {
+            user.sendMessage(existingParticipantsMsg);
+        } catch (IOException e) {
+        }
+        ;
     }
 }
