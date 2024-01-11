@@ -33,14 +33,14 @@ public class UserSession implements Closeable {
         this.outgoingMedia.addIceCandidateFoundListener(this::makeIceJson);
     }
 
-    public void addCandidate(IceCandidate candidate, String sessionId) {
-        if ((this.session.getId()).equals(sessionId)) {
+    public void addCandidate(IceCandidate candidate, String name) {
+        if (this.name.compareTo(name) == 0) {
             outgoingMedia.addIceCandidate(candidate);
-            return;
-        }
-        WebRtcEndpoint webRtc = incomingMedia.get(sessionId);
-        if (webRtc != null) {
-            webRtc.addIceCandidate(candidate);
+        } else {
+            WebRtcEndpoint webRtc = incomingMedia.get(name);
+            if (webRtc != null) {
+                webRtc.addIceCandidate(candidate);
+            }
         }
     }
 
