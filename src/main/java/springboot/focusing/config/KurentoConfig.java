@@ -44,7 +44,7 @@ public class KurentoConfig implements WebSocketConfigurer {
         Map<String, KurentoHandler> handlerMap = new HashMap<>();
         handlerMap.put("join", new JoinHandler(userRegistry(), kurentoClient()));
         handlerMap.put("onIceCandidate", new ICEHandler(userRegistry()));
-        handlerMap.put("receiveVideoFrom", new ReceiveVideoHandler());
+        handlerMap.put("receiveVideoFrom", new ReceiveVideoHandler(userRegistry()));
 
         return new KurentoHandlerAdapter(Collections.unmodifiableMap(handlerMap));
     }

@@ -30,6 +30,10 @@ public class UserRegistry implements Closeable {
         return userBySessionId.get(session.getId());
     }
 
+    public UserSession findByName(String name) {
+        return userByName.get(name);
+    }
+
     public boolean isExist(String sessionId) {
         return userBySessionId.containsKey(sessionId);
     }
