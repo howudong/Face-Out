@@ -11,6 +11,8 @@ import springboot.focusing.domain.UserSession;
 import springboot.focusing.handler.KurentoHandler;
 import springboot.focusing.service.UserRegistry;
 
+import java.io.IOException;
+
 @RequiredArgsConstructor
 @Slf4j
 public class JoinHandler extends TextWebSocketHandler implements KurentoHandler {
@@ -21,8 +23,10 @@ public class JoinHandler extends TextWebSocketHandler implements KurentoHandler 
     public void process(WebSocketSession session, JsonObject jsonMessage) {
         UserSession user = createUserSession(session, jsonMessage);
         registry.register(session.getId(), user);
-        log.info("PARTICIPANT: trying to join room");
+        notifyOthers(user);
+
     }
+
 
     @Override
     public void onError() {
@@ -38,5 +42,22 @@ public class JoinHandler extends TextWebSocketHandler implements KurentoHandler 
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
         registry.removeBySession(session);
+    }
+
+    private void notifyOthers(UserSession newParticipant) {
+        log.info("PARTICIPANT: trying to join room");
+        final JsonObject newParticipantMsg = new JsonObject();
+        newParticipantMsg.addProperty("id", "newParticipantArrived");
+        newParticipantMsg.addProperty("name", newParticipant.getName());
+
+        for (final UserSession participant : registry.getAllSession()) {
+            try {
+                participant.sendMessage(newParticipantMsg);
+            } catch (final IOException e) {
+                log.debug("ROOM {}: participant {} could not be notified",
+                        newParticipant.getName(),
+                        participant.getName(), e);
+            }
+        }
     }
 }
