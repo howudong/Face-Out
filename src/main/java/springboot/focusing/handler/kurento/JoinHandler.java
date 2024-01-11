@@ -28,7 +28,6 @@ public class JoinHandler extends TextWebSocketHandler implements KurentoHandler 
         registry.register(session.getId(), user);
         notifyOthers(user);
         sendParticipantNames(user);
-
     }
 
 

@@ -19,7 +19,7 @@ public class ReceiveVideoHandler implements KurentoHandler {
         final UserSession sender = registry.findByName(senderName);
         final String sdpOffer = jsonMessage.get("sdpOffer").getAsString();
 
-        UserSession receiver = registry.findBySessionId(session);
+        UserSession receiver = registry.findBySession(session);
         try {
             receiver.receiveVideoFrom(sender, sdpOffer);
         } catch (IOException e) {
