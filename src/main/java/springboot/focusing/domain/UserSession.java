@@ -33,11 +33,6 @@ public class UserSession implements Closeable {
                 .useDataChannels()
                 .build();
         this.outgoingMedia.addIceCandidateFoundListener(this::makeIceJson);
-
-    }
-
-    public void release() {
-        this.mediaPipeline.release();
     }
 
     public void addCandidate(IceCandidate candidate, String sessionId) {
@@ -49,6 +44,21 @@ public class UserSession implements Closeable {
         if (webRtc != null) {
             webRtc.addIceCandidate(candidate);
         }
+    }
+
+    public void sendMessage(JsonObject message) throws IOException {
+        log.debug("USER {}: Sending message {}", name, message);
+        synchronized (session) {
+            session.sendMessage(new TextMessage(message.toString()));
+        }
+    }
+
+    public void release() {
+        this.mediaPipeline.release();
+    }
+
+    public String getName() {
+        return name;
     }
 
     @Override
