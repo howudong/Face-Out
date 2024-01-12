@@ -73,30 +73,25 @@ public class UserSession implements Closeable {
         response.addProperty("id", "iceCandidate");
         response.add("candidate", JsonUtils.toJsonObject(event.getCandidate()));
         try {
-            synchronized (session) {
-                session.sendMessage(new TextMessage(response.toString()));
-            }
+            sendMessage(response);
         } catch (IOException e) {
-            log.debug(e.getMessage());
         }
+        ;
     }
 
     public void receiveVideoFrom(UserSession sender, String sdpOffer) throws IOException {
-        log.info("USER {}: SdpOffer for {} is {}", this.name, sender.getName(), sdpOffer);
+        log.info("USER {}: SdpOffer for {} receiveVideoFrom", this.name, sender.getName());
 
-        WebRtcEndpoint endpoint = this.getEndpointForUser(sender);
-        if (!endpoint.equals(outgoingMedia)) {
-            final String ipSdpAnswer = endpoint.processOffer(sdpOffer);
-            final JsonObject scParams = new JsonObject();
-            scParams.addProperty("id", "receiveVideoAnswer");
-            scParams.addProperty("name", sender.getName());
-            scParams.addProperty("sdpAnswer", ipSdpAnswer);
+        final String ipSdpAnswer = this.getEndpointForUser(sender).processOffer(sdpOffer);
+        final JsonObject scParams = new JsonObject();
+        scParams.addProperty("id", "receiveVideoAnswer");
+        scParams.addProperty("name", sender.getName());
+        scParams.addProperty("sdpAnswer", ipSdpAnswer);
 
-            log.info("USER {}: SdpAnswer for {} is {}", this.name, sender.getName(), ipSdpAnswer);
-            this.sendMessage(scParams);
-        }
+        log.info("USER {}: SdpAnswer for {} receiveVideoAnswer", this.name, sender.getName());
+        this.sendMessage(scParams);
         log.info("gather candidates");
-        endpoint.gatherCandidates();
+        this.getEndpointForUser(sender).gatherCandidates();
     }
 
     private WebRtcEndpoint getEndpointForUser(final UserSession sender) {

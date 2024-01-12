@@ -19,15 +19,14 @@ import java.io.IOException;
 @RequiredArgsConstructor
 @Slf4j
 public class JoinHandler extends TextWebSocketHandler implements KurentoHandler {
-    private final UserRegistry registry;
     private final KurentoClient kurentoClient;
 
     @Override
-    public void process(WebSocketSession session, JsonObject jsonMessage) {
+    public void process(WebSocketSession session, UserRegistry registry, JsonObject jsonMessage) {
         UserSession user = createUserSession(session, jsonMessage);
         registry.register(session.getId(), user);
-        notifyOthers(user);
-        sendParticipantNames(user);
+        notifyOthers(registry, user);
+        sendParticipantNames(registry, user);
     }
 
 
@@ -36,18 +35,18 @@ public class JoinHandler extends TextWebSocketHandler implements KurentoHandler 
         //TODO
     }
 
+    @Override
+    public void afterConnectionEstablished(WebSocketSession session) throws Exception {
+
+    }
+
     private UserSession createUserSession(WebSocketSession session, JsonObject jsonMessage) {
         String name = jsonMessage.get("name").getAsString();
         MediaPipeline pipeline = kurentoClient.createMediaPipeline();
         return new UserSession(pipeline, session, name);
     }
 
-    @Override
-    public void afterConnectionEstablished(WebSocketSession session) throws Exception {
-        registry.removeBySession(session);
-    }
-
-    private void notifyOthers(UserSession newParticipant) {
+    private void notifyOthers(UserRegistry registry, UserSession newParticipant) {
         log.info("PARTICIPANT: trying to join room");
         final JsonObject newParticipantMsg = new JsonObject();
         newParticipantMsg.addProperty("id", "newParticipantArrived");
@@ -67,7 +66,7 @@ public class JoinHandler extends TextWebSocketHandler implements KurentoHandler 
         }
     }
 
-    private void sendParticipantNames(UserSession user) {
+    private void sendParticipantNames(UserRegistry registry, UserSession user) {
         final JsonArray participantsArray = new JsonArray();
         for (final UserSession participant : registry.getAllSession()) {
             if (!participant.getName().equals(user.getName())) {

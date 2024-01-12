@@ -3,25 +3,28 @@ package springboot.focusing.handler;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 import springboot.focusing.KurentoHandlerAdapter;
+import springboot.focusing.service.UserRegistry;
 
 import java.io.IOException;
 import java.util.Optional;
 
+@Component
+@RequiredArgsConstructor
 public class MainHandler extends TextWebSocketHandler {
     private static final Logger log = LoggerFactory.getLogger(MainHandler.class);
     private static final Gson gson = new GsonBuilder().create();
 
     private final KurentoHandlerAdapter kurentoHandlerAdapter;
+    private final UserRegistry registry;
 
-    public MainHandler(KurentoHandlerAdapter kurentoHandlerAdapter) {
-        this.kurentoHandlerAdapter = kurentoHandlerAdapter;
-    }
 
     @Override
     public void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
@@ -34,12 +37,11 @@ public class MainHandler extends TextWebSocketHandler {
             return;
         }
         try {
-            kurentoHandler.get().process(session, jsonMessage);
+            kurentoHandler.get().process(session, registry, jsonMessage);
         } catch (IOException e) {
             kurentoHandler.get().onError();
         }
     }
-
 
     private void sendError(WebSocketSession session) {
         try {

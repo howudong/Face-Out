@@ -31,7 +31,7 @@ public class KurentoConfig implements WebSocketConfigurer {
     @Bean
     public MainHandler createKurentoHandler() {
         KurentoHandlerAdapter kurentoHandlerAdapter = configKurentoHandler();
-        return new MainHandler(kurentoHandlerAdapter);
+        return new MainHandler(kurentoHandlerAdapter, userRegistry());
     }
 
     @Bean
@@ -39,11 +39,12 @@ public class KurentoConfig implements WebSocketConfigurer {
         return new UserRegistry();
     }
 
-    private KurentoHandlerAdapter configKurentoHandler() {
+    @Bean
+    public KurentoHandlerAdapter configKurentoHandler() {
         Map<String, KurentoHandler> handlerMap = new HashMap<>();
-        handlerMap.put("join", new JoinHandler(userRegistry(), kurentoClient()));
-        handlerMap.put("onIceCandidate", new ICEHandler(userRegistry()));
-        handlerMap.put("receiveVideoFrom", new ReceiveVideoHandler(userRegistry()));
+        handlerMap.put("join", new JoinHandler(kurentoClient()));
+        handlerMap.put("onIceCandidate", new ICEHandler());
+        handlerMap.put("receiveVideoFrom", new ReceiveVideoHandler());
 
         return new KurentoHandlerAdapter(Collections.unmodifiableMap(handlerMap));
     }
