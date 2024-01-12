@@ -23,6 +23,7 @@ public class UserRegistry implements Closeable {
     public void register(String id, UserSession userSession) {
         log.info("register UserSession");
         userBySessionId.put(id, userSession);
+        log.info("Input UserName : {}", userSession.getName());
         userByName.put(userSession.getName(), userSession);
     }
 
