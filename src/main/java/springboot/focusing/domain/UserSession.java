@@ -84,16 +84,19 @@ public class UserSession implements Closeable {
     public void receiveVideoFrom(UserSession sender, String sdpOffer) throws IOException {
         log.info("USER {}: SdpOffer for {} is {}", this.name, sender.getName(), sdpOffer);
 
-        final String ipSdpAnswer = this.getEndpointForUser(sender).processOffer(sdpOffer);
-        final JsonObject scParams = new JsonObject();
-        scParams.addProperty("id", "receiveVideoAnswer");
-        scParams.addProperty("name", sender.getName());
-        scParams.addProperty("sdpAnswer", ipSdpAnswer);
+        WebRtcEndpoint endpoint = this.getEndpointForUser(sender);
+        if (!endpoint.equals(outgoingMedia)) {
+            final String ipSdpAnswer = endpoint.processOffer(sdpOffer);
+            final JsonObject scParams = new JsonObject();
+            scParams.addProperty("id", "receiveVideoAnswer");
+            scParams.addProperty("name", sender.getName());
+            scParams.addProperty("sdpAnswer", ipSdpAnswer);
 
-        log.info("USER {}: SdpAnswer for {} is {}", this.name, sender.getName(), ipSdpAnswer);
-        this.sendMessage(scParams);
+            log.info("USER {}: SdpAnswer for {} is {}", this.name, sender.getName(), ipSdpAnswer);
+            this.sendMessage(scParams);
+        }
         log.info("gather candidates");
-        this.getEndpointForUser(sender).gatherCandidates();
+        endpoint.gatherCandidates();
     }
 
     private WebRtcEndpoint getEndpointForUser(final UserSession sender) {
