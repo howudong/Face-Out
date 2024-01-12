@@ -30,18 +30,22 @@ public class MainHandler extends TextWebSocketHandler {
 
         Optional<KurentoHandler> kurentoHandler = kurentoHandlerAdapter.getHandlerById(id);
         if (kurentoHandler.isEmpty()) {
-            sendError(session, "Invalid Message");
+            sendError(session);
             return;
         }
-        kurentoHandler.get().process(session, jsonMessage);
+        try {
+            kurentoHandler.get().process(session, jsonMessage);
+        } catch (IOException e) {
+            kurentoHandler.get().onError();
+        }
     }
 
 
-    private void sendError(WebSocketSession session, String message) {
+    private void sendError(WebSocketSession session) {
         try {
             JsonObject response = new JsonObject();
             response.addProperty("id", "error");
-            response.addProperty("message", message);
+            response.addProperty("message", "Invalid Message");
             session.sendMessage(new TextMessage(response.toString()));
         } catch (IOException e) {
             log.error("Exception sending message", e);

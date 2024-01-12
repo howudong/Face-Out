@@ -14,17 +14,13 @@ public class ReceiveVideoHandler implements KurentoHandler {
     private final UserRegistry registry;
 
     @Override
-    public void process(WebSocketSession session, JsonObject jsonMessage) {
+    public void process(WebSocketSession session, JsonObject jsonMessage) throws IOException {
         final String senderName = jsonMessage.get("sender").getAsString();
         final UserSession sender = registry.findByName(senderName);
         final String sdpOffer = jsonMessage.get("sdpOffer").getAsString();
 
         UserSession receiver = registry.findBySession(session);
-        try {
-            receiver.receiveVideoFrom(sender, sdpOffer);
-        } catch (IOException e) {
-        }
-        ;
+        receiver.receiveVideoFrom(sender, sdpOffer);
     }
 
     @Override
