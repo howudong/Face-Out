@@ -1,7 +1,6 @@
 package springboot.focusing.config;
 
 import org.kurento.client.KurentoClient;
-import org.kurento.jsonrpc.client.JsonRpcClientNettyWebSocket;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -58,14 +57,9 @@ public class KurentoConfig implements WebSocketConfigurer {
     public KurentoClient kurentoClient() {
         String envKmsUrl = System.getenv("KMS_URL");
         if (Objects.isNull(envKmsUrl) || envKmsUrl.isEmpty()) {
-            return createKurentoClient(kmsUrl);
+            return KurentoClient.create(kmsUrl);
         }
-        return createKurentoClient(envKmsUrl);
-    }
-
-    private KurentoClient createKurentoClient(String url) {
-        JsonRpcClientNettyWebSocket webSocket = new JsonRpcClientNettyWebSocket(url);
-        return KurentoClient.createFromJsonRpcClient(webSocket);
+        return KurentoClient.create(envKmsUrl);
     }
 
     /*
