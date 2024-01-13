@@ -25,6 +25,6 @@ public class ReceiveVideoHandler implements KurentoHandler {
 
     @Override
     public void onError() {
-        //TODO
+        log.error("ReceiveVideoHandler : Error Occured");
     }
 }
