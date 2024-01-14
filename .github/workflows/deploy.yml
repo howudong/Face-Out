@@ -1,7 +1,7 @@
 name: deploy
 on:
   push:
-    branches: ['develop','features/\#1']
+    branches: [ 'develop','features/\#1' ]
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -24,6 +24,7 @@ jobs:
             sudo fuser -k 32000/tcp
             sudo fuser -k 443/tcp
             git fetch
+            git stash
             git pull origin ${{ github.head_ref }}
             docker-compose up -d
             echo '17539' | sudo -s ./gradlew clean build -x test
