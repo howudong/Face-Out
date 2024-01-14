@@ -1,7 +1,7 @@
 name: deploy
 on:
   push:
-    branches: [ 'develop','features/#1' ]
+    branches: [ 'develop','features/#1,features/#5' ]
 jobs:
   deploy:
     runs-on: ubuntu-latest
