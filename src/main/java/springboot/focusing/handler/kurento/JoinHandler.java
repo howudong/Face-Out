@@ -19,6 +19,7 @@ import java.io.IOException;
 @Slf4j
 public class JoinHandler implements KurentoHandler {
     private final KurentoClient kurentoClient;
+    private final MediaPipeline pipeline;
 
     @Override
     public void process(WebSocketSession session, UserRegistry registry, JsonObject jsonMessage) {
@@ -28,7 +29,6 @@ public class JoinHandler implements KurentoHandler {
         sendParticipantNames(registry, user);
     }
 
-
     @Override
     public void onError() {
         //TODO
@@ -36,7 +36,6 @@ public class JoinHandler implements KurentoHandler {
 
     private UserSession createUserSession(WebSocketSession session, JsonObject jsonMessage) {
         String name = jsonMessage.get("name").getAsString();
-        MediaPipeline pipeline = kurentoClient.createMediaPipeline();
         return new UserSession(pipeline, session, name);
     }
 

@@ -29,13 +29,15 @@ public class ReceiveVideoHandler implements KurentoHandler {
     }
 
     private UserSession findSenderSession(UserRegistry registry, String senderName) {
-        return registry.findByName(senderName)
+        return registry
+                .findByName(senderName)
                 .orElseThrow(
                         () -> new NoSuchElementException("[ReceiveVideoHandler] Can not find sender"));
     }
 
     private UserSession findReceiverSession(WebSocketSession session, UserRegistry registry) {
-        return registry.findBySessionId(session.getId())
+        return registry
+                .findBySessionId(session.getId())
                 .orElseThrow(()
                         -> new NoSuchElementException("[ReceiveVideoHandler] Can not find receiver"));
     }
