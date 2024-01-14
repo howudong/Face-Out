@@ -1,10 +1,7 @@
 package springboot.focusing.domain;
 
 import com.google.gson.JsonObject;
-import org.kurento.client.IceCandidate;
-import org.kurento.client.IceCandidateFoundEvent;
-import org.kurento.client.MediaPipeline;
-import org.kurento.client.WebRtcEndpoint;
+import org.kurento.client.*;
 import org.kurento.jsonrpc.JsonUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,17 +52,43 @@ public class UserSession implements Closeable {
         }
     }
 
-    public void release() {
-        this.mediaPipeline.release();
-    }
-
     public String getName() {
         return name;
     }
 
     @Override
     public void close() throws IOException {
-        release();
+        log.debug("PARTICIPANT {}: Releasing resources", this.name);
+        for (final String remoteParticipantName : incomingMedia.keySet()) {
+            log.trace("PARTICIPANT {}: Released incoming EP for {}", this.name, remoteParticipantName);
+            final WebRtcEndpoint ep = this.incomingMedia.get(remoteParticipantName);
+
+            ep.release(new Continuation<Void>() {
+                @Override
+                public void onSuccess(Void result) throws Exception {
+                    log.info("PARTICIPANT {}: Released successfully incoming EP for {}",
+                            UserSession.this.name, remoteParticipantName);
+                }
+
+                @Override
+                public void onError(Throwable cause) throws Exception {
+                    log.warn("PARTICIPANT {}: Could not release incoming EP for {}", UserSession.this.name,
+                            remoteParticipantName);
+                }
+            });
+        }
+        outgoingMedia.release(new Continuation<Void>() {
+
+            @Override
+            public void onSuccess(Void result) throws Exception {
+                log.info("PARTICIPANT {}: Released outgoing EP", UserSession.this.name);
+            }
+
+            @Override
+            public void onError(Throwable cause) throws Exception {
+                log.warn("USER {}: Could not release outgoing EP", UserSession.this.name);
+            }
+        });
     }
 
     private void makeIceJson(IceCandidateFoundEvent event) {
@@ -73,10 +96,12 @@ public class UserSession implements Closeable {
         response.addProperty("id", "iceCandidate");
         response.add("candidate", JsonUtils.toJsonObject(event.getCandidate()));
         try {
-            sendMessage(response);
+            synchronized (session) {
+                session.sendMessage(new TextMessage(response.toString()));
+            }
         } catch (IOException e) {
+            log.debug(e.getMessage());
         }
-        ;
     }
 
     public void receiveVideoFrom(UserSession sender, String sdpOffer) throws IOException {
