@@ -5,11 +5,11 @@ import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-import org.springframework.web.socket.WebSocketSession;
 import springboot.focusing.domain.UserSession;
 
 import java.io.Closeable;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 @RequiredArgsConstructor
@@ -27,16 +27,12 @@ public class UserRegistry implements Closeable {
         userByName.put(userSession.getName(), userSession);
     }
 
-    public UserSession findBySession(WebSocketSession session) {
-        return userBySessionId.get(session.getId());
+    public Optional<UserSession> findBySessionId(String sessionId) {
+        return Optional.ofNullable(userBySessionId.get(sessionId));
     }
 
-    public UserSession findByName(String name) {
-        return userByName.get(name);
-    }
-
-    public boolean isExist(String sessionId) {
-        return userBySessionId.containsKey(sessionId);
+    public Optional<UserSession> findByName(String name) {
+        return Optional.ofNullable(userByName.get(name));
     }
 
     public List<UserSession> getAllSession() {
@@ -45,10 +41,12 @@ public class UserRegistry implements Closeable {
                 .toList();
     }
 
-    public void removeBySession(WebSocketSession session) {
-        UserSession removeSession = findBySession(session);
-        userByName.remove(removeSession.getName());
-        userBySessionId.remove(session.getId());
+    public void removeBySession(UserSession userSession, String sessionId) {
+        this.findByName(userSession.getName())
+                .ifPresent(e -> userByName.remove(e.getName()));
+        
+        this.findBySessionId(sessionId)
+                .ifPresent(e -> userBySessionId.remove(sessionId));
     }
 
     @Override
