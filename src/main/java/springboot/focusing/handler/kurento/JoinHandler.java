@@ -9,7 +9,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.kurento.client.KurentoClient;
 import org.kurento.client.MediaPipeline;
 import org.springframework.web.socket.WebSocketSession;
-import org.springframework.web.socket.handler.TextWebSocketHandler;
 import springboot.focusing.domain.UserSession;
 import springboot.focusing.handler.KurentoHandler;
 import springboot.focusing.service.UserRegistry;
@@ -18,7 +17,7 @@ import java.io.IOException;
 
 @RequiredArgsConstructor
 @Slf4j
-public class JoinHandler extends TextWebSocketHandler implements KurentoHandler {
+public class JoinHandler implements KurentoHandler {
     private final KurentoClient kurentoClient;
 
     @Override
@@ -33,11 +32,6 @@ public class JoinHandler extends TextWebSocketHandler implements KurentoHandler 
     @Override
     public void onError() {
         //TODO
-    }
-
-    @Override
-    public void afterConnectionEstablished(WebSocketSession session) throws Exception {
-
     }
 
     private UserSession createUserSession(WebSocketSession session, JsonObject jsonMessage) {
