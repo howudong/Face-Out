@@ -41,7 +41,7 @@ public class KurentoConfig implements WebSocketConfigurer {
     public KurentoHandlerAdapter configKurentoHandler() {
         return new KurentoHandlerAdapter(
                 Map.of(
-                        "join", new JoinHandler(kurentoClient(), kurentoClient().createMediaPipeline()),
+                        "join", new JoinHandler(kurentoClient()),
                         "onIceCandidate", new ICEHandler(),
                         "receiveVideoFrom", new ReceiveVideoHandler(),
                         "error", new ErrorHandler()));
