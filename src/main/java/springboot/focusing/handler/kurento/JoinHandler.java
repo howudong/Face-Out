@@ -19,7 +19,7 @@ import java.io.IOException;
 @Slf4j
 public class JoinHandler implements KurentoHandler {
     private final KurentoClient kurentoClient;
-    private MediaPipeline pipeline = kurentoClient.createMediaPipeline();
+    private final MediaPipeline pipeline;
 
     @Override
     public void process(WebSocketSession session, UserRegistry registry, JsonObject jsonMessage) {
