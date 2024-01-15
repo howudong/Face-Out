@@ -32,10 +32,12 @@ public class UserSession implements Closeable {
 
     public void addCandidate(IceCandidate candidate, String name) {
         if (this.name.compareTo(name) == 0) {
+            log.info("outgoingMedia.addIceCandidate : {} ", name);
             outgoingMedia.addIceCandidate(candidate);
         } else {
             WebRtcEndpoint webRtc = incomingMedia.get(name);
             if (webRtc != null) {
+                log.info("incoming.addIceCandidate : {} ", name);
                 webRtc.addIceCandidate(candidate);
             }
         }

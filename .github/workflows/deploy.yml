@@ -24,6 +24,8 @@ jobs:
             sudo fuser -k 32000/tcp
             sudo fuser -k 443/tcp
             git stash
+            git remote update
+            git switch ${{github.head_ref}}
             git fetch
             git pull origin ${{github.head_ref}}
             docker-compose up -d
