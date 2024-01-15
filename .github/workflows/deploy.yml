@@ -25,9 +25,9 @@ jobs:
             sudo fuser -k 443/tcp
             git stash
             git remote update
-            git switch ${{github.head_ref}}
+            git branch --set-upstream-to=origin/${{github.head_ref}}
             git fetch
-            git pull origin ${{github.head_ref}}
+            git pull
             docker-compose up -d
             echo '17539' | sudo -s ./gradlew clean build -x test
             nohup java -jar build/libs/focusing-0.0.1-SNAPSHOT.jar > /tmp/nohup.log 2>&1 &
