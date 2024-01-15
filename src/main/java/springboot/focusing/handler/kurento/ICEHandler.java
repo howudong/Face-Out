@@ -13,6 +13,7 @@ import java.io.IOException;
 public class ICEHandler implements KurentoHandler {
     @Override
     public void process(WebSocketSession session, UserRegistry registry, JsonObject jsonMessage) throws IOException {
+        log.info("ICE Handler Process");
         registry.findBySessionId(session.getId())
                 .ifPresent(user -> {
                     IceCandidate candidate = makeIceCandidate(jsonMessage);
