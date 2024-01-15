@@ -27,7 +27,7 @@ public class UserSession implements Closeable {
         this.session = session;
         this.name = name;
         this.outgoingMedia = new WebRtcEndpoint.Builder(mediaPipeline).build();
-        this.outgoingMedia.addIceCandidateFoundListener(this::makeIceJson);
+        this.outgoingMedia.addIceCandidateFoundListener(event -> makeIceJson(event, name));
     }
 
     public void addCandidate(IceCandidate candidate, String name) {
@@ -93,9 +93,10 @@ public class UserSession implements Closeable {
         });
     }
 
-    private void makeIceJson(IceCandidateFoundEvent event) {
+    private void makeIceJson(IceCandidateFoundEvent event, String username) {
         JsonObject response = new JsonObject();
         response.addProperty("id", "iceCandidate");
+        response.addProperty("name", username);
         response.add("candidate", JsonUtils.toJsonObject(event.getCandidate()));
         try {
             synchronized (session) {
@@ -133,21 +134,7 @@ public class UserSession implements Closeable {
         if (incoming == null) {
             log.info("PARTICIPANT {}: creating new endpoint for {}", this.name, sender.getName());
             incoming = new WebRtcEndpoint.Builder(mediaPipeline).build();
-
-            incoming.addIceCandidateFoundListener(event -> {
-                JsonObject response = new JsonObject();
-                response.addProperty("id", "iceCandidate");
-                response.addProperty("name", sender.getName());
-                response.add("candidate", JsonUtils.toJsonObject(event.getCandidate()));
-                try {
-                    synchronized (session) {
-                        session.sendMessage(new TextMessage(response.toString()));
-                    }
-                } catch (IOException e) {
-                    log.debug(e.getMessage());
-                }
-            });
-
+            incoming.addIceCandidateFoundListener(event -> makeIceJson(event, sender.getName()));
             incomingMedia.put(sender.getName(), incoming);
         }
 
