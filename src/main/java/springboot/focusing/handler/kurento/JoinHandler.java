@@ -22,7 +22,7 @@ public class JoinHandler implements KurentoHandler {
     private final MediaPipeline pipeline;
 
     @Override
-    public void process(WebSocketSession session, UserRegistry registry, JsonObject jsonMessage) {
+    public void process(WebSocketSession session, UserRegistry registry, JsonObject jsonMessage) throws IOException {
         UserSession user = createUserSession(session, jsonMessage);
         registry.register(session.getId(), user);
         notifyOthers(registry, user);
@@ -59,7 +59,7 @@ public class JoinHandler implements KurentoHandler {
         }
     }
 
-    private void sendParticipantNames(UserRegistry registry, UserSession user) {
+    private void sendParticipantNames(UserRegistry registry, UserSession user) throws IOException {
         final JsonArray participantsArray = new JsonArray();
         for (final UserSession participant : registry.getAllSession()) {
             if (!participant.getName().equals(user.getName())) {
@@ -73,10 +73,6 @@ public class JoinHandler implements KurentoHandler {
         existingParticipantsMsg.add("data", participantsArray);
         log.info("PARTICIPANT {}: sending a list of {} participants", user.getName(),
                 participantsArray.size());
-        try {
-            user.sendMessage(existingParticipantsMsg);
-        } catch (IOException e) {
-        }
-        ;
+        user.sendMessage(existingParticipantsMsg);
     }
 }
