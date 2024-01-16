@@ -42,9 +42,10 @@ public class UserRegistry implements Closeable {
     }
 
     public void removeBySession(UserSession userSession, String sessionId) {
+        log.info("removeSession name {}, id {}", userSession.getName(), sessionId);
         this.findByName(userSession.getName())
                 .ifPresent(e -> userByName.remove(e.getName()));
-        
+
         this.findBySessionId(sessionId)
                 .ifPresent(e -> userBySessionId.remove(sessionId));
     }
