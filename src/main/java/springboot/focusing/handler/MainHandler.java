@@ -36,6 +36,13 @@ public class MainHandler extends TextWebSocketHandler {
     }
 
 
+    @Override
+    public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
+        registry.findBySessionId(session.getId())
+                .ifPresent(userSession ->
+                        registry.removeBySession(userSession, session.getId()));
+    }
+
     private void processByHandler(WebSocketSession session, JsonObject jsonMessage, KurentoHandler handler) {
         try {
             handler.process(session, registry, jsonMessage);
@@ -43,13 +50,5 @@ public class MainHandler extends TextWebSocketHandler {
             handler.onError();
             log.warn("Error Occurred on {}", handler.getClass());
         }
-    }
-
-    @Override
-    public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
-        registry.findBySessionId(session.getId())
-                .ifPresentOrElse(
-                        userSession -> registry.removeBySession(userSession, session.getId()),
-                        () -> log.error("can not find target WebSocket : {}", session.getId()));
     }
 }
