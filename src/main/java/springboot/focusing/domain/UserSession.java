@@ -54,6 +54,47 @@ public class UserSession implements Closeable {
         }
     }
 
+    public WebRtcEndpoint getEndpointForUser(final UserSession sender) {
+        if (sender.getName().equals(name)) {
+            log.info("PARTICIPANT {}: configuring loopback", this.name);
+            return outgoingMedia;
+        }
+
+        log.info("PARTICIPANT {}: receiving video from {}", this.name, sender.getName());
+
+        WebRtcEndpoint incoming = incomingMedia.get(sender.getName());
+        if (incoming == null) {
+            log.info("PARTICIPANT {}: creating new endpoint for {}", this.name, sender.getName());
+            incoming = new WebRtcEndpoint.Builder(mediaPipeline).build();
+            incoming.addIceCandidateFoundListener(event -> makeIceJson(event, sender.getName()));
+            incomingMedia.put(sender.getName(), incoming);
+        }
+
+        log.info("PARTICIPANT {}: obtained endpoint for {}", this.name, sender.getName());
+        sender.connectPeer(incoming);
+        return incoming;
+    }
+
+    public void cancelVideoFrom(final String senderName) {
+        log.debug("PARTICIPANT {}: canceling video reception from {}", this.name, senderName);
+        final WebRtcEndpoint incoming = incomingMedia.remove(senderName);
+
+        log.debug("PARTICIPANT {}: removing endpoint for {}", this.name, senderName);
+        incoming.release(new Continuation<Void>() {
+            @Override
+            public void onSuccess(Void result) throws Exception {
+                log.trace("PARTICIPANT {}: Released successfully incoming EP for {}",
+                        UserSession.this.name, senderName);
+            }
+
+            @Override
+            public void onError(Throwable cause) throws Exception {
+                log.warn("PARTICIPANT {}: Could not release incoming EP for {}", UserSession.this.name,
+                        senderName);
+            }
+        });
+    }
+
     public String getName() {
         return name;
     }
@@ -104,26 +145,5 @@ public class UserSession implements Closeable {
         } catch (IOException e) {
             log.debug(e.getMessage());
         }
-    }
-
-    public WebRtcEndpoint getEndpointForUser(final UserSession sender) {
-        if (sender.getName().equals(name)) {
-            log.info("PARTICIPANT {}: configuring loopback", this.name);
-            return outgoingMedia;
-        }
-
-        log.info("PARTICIPANT {}: receiving video from {}", this.name, sender.getName());
-
-        WebRtcEndpoint incoming = incomingMedia.get(sender.getName());
-        if (incoming == null) {
-            log.info("PARTICIPANT {}: creating new endpoint for {}", this.name, sender.getName());
-            incoming = new WebRtcEndpoint.Builder(mediaPipeline).build();
-            incoming.addIceCandidateFoundListener(event -> makeIceJson(event, sender.getName()));
-            incomingMedia.put(sender.getName(), incoming);
-        }
-
-        log.info("PARTICIPANT {}: obtained endpoint for {}", this.name, sender.getName());
-        sender.connectPeer(incoming);
-        return incoming;
     }
 }

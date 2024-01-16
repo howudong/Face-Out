@@ -10,10 +10,7 @@ import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry
 import org.springframework.web.socket.server.standard.ServletServerContainerFactoryBean;
 import springboot.focusing.KurentoHandlerAdapter;
 import springboot.focusing.handler.MainHandler;
-import springboot.focusing.handler.kurento.ErrorHandler;
-import springboot.focusing.handler.kurento.ICEHandler;
-import springboot.focusing.handler.kurento.JoinHandler;
-import springboot.focusing.handler.kurento.ReceiveVideoHandler;
+import springboot.focusing.handler.kurento.*;
 import springboot.focusing.service.UserRegistry;
 
 import java.util.Map;
@@ -44,7 +41,8 @@ public class KurentoConfig implements WebSocketConfigurer {
                         "join", new JoinHandler(kurentoClient().createMediaPipeline()),
                         "onIceCandidate", new ICEHandler(),
                         "receiveVideoFrom", new ReceiveVideoHandler(),
-                        "error", new ErrorHandler()));
+                        "error", new ErrorHandler(),
+                        "exit", new ExitHandler()));
     }
 
     /*
