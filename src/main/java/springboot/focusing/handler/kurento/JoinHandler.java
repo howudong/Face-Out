@@ -6,7 +6,6 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.kurento.client.KurentoClient;
 import org.kurento.client.MediaPipeline;
 import org.springframework.web.socket.WebSocketSession;
 import springboot.focusing.domain.UserSession;
@@ -18,7 +17,6 @@ import java.io.IOException;
 @RequiredArgsConstructor
 @Slf4j
 public class JoinHandler implements KurentoHandler {
-    private final KurentoClient kurentoClient;
     private final MediaPipeline pipeline;
 
     @Override
