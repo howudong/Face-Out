@@ -40,7 +40,7 @@ public class ReceiveVideoHandler implements KurentoHandler {
 
     @Override
     public void onError() {
-        log.error("ReceiveVideoHandler : Error Occured");
+        log.error("ReceiveVideoHandler : Error Occurred");
     }
 
     private UserSession findSenderSession(UserRegistry registry, String senderName) {
