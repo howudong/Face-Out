@@ -14,6 +14,8 @@ import org.springframework.web.socket.handler.TextWebSocketHandler;
 import springboot.focusing.KurentoHandlerAdapter;
 import springboot.focusing.service.UserRegistry;
 
+import java.io.IOException;
+
 @Component
 @RequiredArgsConstructor
 public class MainHandler extends TextWebSocketHandler {
@@ -29,15 +31,25 @@ public class MainHandler extends TextWebSocketHandler {
         JsonObject jsonMessage = gson.fromJson(message.getPayload(), JsonObject.class);
         String id = jsonMessage.get("id").getAsString();
 
-        KurentoHandler kurentoHandler = kurentoHandlerAdapter.getHandlerById(id);
-        kurentoHandler.process(session, registry, jsonMessage);
+        KurentoHandler findHandler = kurentoHandlerAdapter.findHandlerById(id);
+        processByHandler(session, jsonMessage, findHandler);
+    }
+
+
+    private void processByHandler(WebSocketSession session, JsonObject jsonMessage, KurentoHandler handler) {
+        try {
+            handler.process(session, registry, jsonMessage);
+        } catch (IOException e) {
+            handler.onError();
+            log.warn("Error Occurred on {}", handler.getClass());
+        }
     }
 
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
         registry.findBySessionId(session.getId())
                 .ifPresentOrElse(
-                        e -> registry.removeBySession(e, session.getId()),
+                        userSession -> registry.removeBySession(userSession, session.getId()),
                         () -> log.error("can not find target WebSocket : {}", session.getId()));
     }
 }

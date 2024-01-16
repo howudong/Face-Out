@@ -20,7 +20,22 @@ public class ReceiveVideoHandler implements KurentoHandler {
         final String sdpOffer = jsonMessage.get("sdpOffer").getAsString();
 
         UserSession receiver = findReceiverSession(session, registry);
-        receiver.receiveVideoFrom(sender, sdpOffer);
+        sendVideoSdpAnswer(sender, receiver, sdpOffer);
+    }
+
+    public void sendVideoSdpAnswer(UserSession sender, UserSession receiver, String sdpOffer) throws IOException {
+        log.info("USER {}: SdpOffer for {} receiveVideoFrom", receiver.getName(), sender.getName());
+
+        final String ipSdpAnswer = receiver.getEndpointForUser(sender).processOffer(sdpOffer);
+        final JsonObject scParams = new JsonObject();
+        scParams.addProperty("id", "receiveVideoAnswer");
+        scParams.addProperty("name", sender.getName());
+        scParams.addProperty("sdpAnswer", ipSdpAnswer);
+
+        log.info("USER {}: SdpAnswer for {} receiveVideoAnswer", receiver.getName(), sender.getName());
+        receiver.sendMessage(scParams);
+        log.info("gather candidates");
+        receiver.getEndpointForUser(sender).gatherCandidates();
     }
 
     @Override
