@@ -10,10 +10,7 @@ import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry
 import org.springframework.web.socket.server.standard.ServletServerContainerFactoryBean;
 import springboot.focusing.KurentoHandlerAdapter;
 import springboot.focusing.handler.MainHandler;
-import springboot.focusing.handler.kurento.ErrorHandler;
-import springboot.focusing.handler.kurento.ICEHandler;
-import springboot.focusing.handler.kurento.JoinHandler;
-import springboot.focusing.handler.kurento.ReceiveVideoHandler;
+import springboot.focusing.handler.kurento.*;
 import springboot.focusing.service.UserRegistry;
 
 import java.util.Map;
@@ -41,10 +38,11 @@ public class KurentoConfig implements WebSocketConfigurer {
     public KurentoHandlerAdapter configKurentoHandler() {
         return new KurentoHandlerAdapter(
                 Map.of(
-                        "join", new JoinHandler(kurentoClient(), kurentoClient().createMediaPipeline()),
+                        "join", new JoinHandler(kurentoClient().createMediaPipeline()),
                         "onIceCandidate", new ICEHandler(),
                         "receiveVideoFrom", new ReceiveVideoHandler(),
-                        "error", new ErrorHandler()));
+                        "error", new ErrorHandler(),
+                        "exit", new ExitHandler()));
     }
 
     /*
@@ -72,7 +70,7 @@ public class KurentoConfig implements WebSocketConfigurer {
         return container;
     }
 
-    // signal 로 요청이 왔을 때 아래의 WebSockerHandler 가 동작하도록 registry 에 설정
+    // signal 로 요청이 왔을 때 아래의 WebSocketHandler 가 동작하도록 registry 에 설정
     // 요청은 클라이언트 접속, close, 메시지 발송 등에 대해 특정 메서드를 호출한다
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {

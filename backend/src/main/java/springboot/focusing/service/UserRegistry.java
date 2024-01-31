@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import springboot.focusing.domain.UserSession;
 
 import java.io.Closeable;
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
@@ -42,22 +43,28 @@ public class UserRegistry implements Closeable {
     }
 
     public void removeBySession(UserSession userSession, String sessionId) {
+        log.info("removeSession name {}, id {}", userSession.getName(), sessionId);
         this.findByName(userSession.getName())
                 .ifPresent(e -> userByName.remove(e.getName()));
-        
+
         this.findBySessionId(sessionId)
                 .ifPresent(e -> userBySessionId.remove(sessionId));
     }
 
     @Override
-    public void close() {
+    public void close() throws IOException {
         for (final UserSession user : userBySessionId.values()) {
-            shutdown();
+            user.close();
         }
     }
 
     @PreDestroy
     private void shutdown() {
-        this.close();
+        try {
+            this.close();
+        } catch (IOException e) {
+
+        }
+        ;
     }
 }
