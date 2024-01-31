@@ -2,6 +2,7 @@ package springboot.focusing.handler.kurento;
 
 import com.google.gson.JsonObject;
 import lombok.extern.slf4j.Slf4j;
+import org.kurento.client.Continuation;
 import org.springframework.web.socket.WebSocketSession;
 import springboot.focusing.domain.UserSession;
 import springboot.focusing.handler.KurentoHandler;
@@ -35,7 +36,18 @@ public class ReceiveVideoHandler implements KurentoHandler {
         log.info("USER {}: SdpAnswer for {} receiveVideoAnswer", receiver.getName(), sender.getName());
         receiver.sendMessage(scParams);
         log.info("gather candidates");
-        receiver.getEndpointForUser(sender).gatherCandidates();
+        receiver.getEndpointForUser(sender).gatherCandidates(new Continuation<Void>() {
+            @Override
+            public void onSuccess(Void result) throws Exception {
+                log.info("USER {} : gatherCandidates Success for {}", receiver.getName(), sender.getName());
+            }
+
+            @Override
+            public void onError(Throwable cause) throws Exception {
+                log.warn("USER {} : gatherCandidates fail for {}", receiver.getName(), sender.getName());
+                cause.printStackTrace();
+            }
+        });
     }
 
     @Override
