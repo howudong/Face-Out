@@ -23,12 +23,12 @@ public class ICEHandler implements KurentoHandler {
 
     @Override
     public void onError() {
-        //TODO
+        log.error("ICEHandler : Error Occurred");
     }
 
     private IceCandidate makeIceCandidate(JsonObject jsonMessage) {
         JsonObject jsonCandidate = jsonMessage.get("candidate").getAsJsonObject();
-
+        log.info("MAKE ICE CANDIDATE {}", jsonCandidate);
         return new IceCandidate(
                 jsonCandidate.get("candidate").getAsString(),
                 jsonCandidate.get("sdpMid").getAsString(),

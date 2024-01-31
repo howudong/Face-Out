@@ -29,7 +29,7 @@ public class JoinHandler implements KurentoHandler {
 
     @Override
     public void onError() {
-        //TODO
+        log.error("JoinHandler : Error Occurred");
     }
 
     private UserSession createUserSession(WebSocketSession session, JsonObject jsonMessage) {
