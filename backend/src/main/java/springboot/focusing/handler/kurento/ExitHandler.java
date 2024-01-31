@@ -15,17 +15,19 @@ import java.util.List;
 public class ExitHandler implements KurentoHandler {
     @Override
     public void process(WebSocketSession session, UserRegistry registry, JsonObject jsonMessage) throws IOException {
-        UserSession user = registry.findBySessionId(session.getId())
+        UserSession user = registry
+                .findBySessionId(session.getId())
                 .orElseThrow(IOException::new);
 
         log.debug("PARTICIPANT {}: exit ", user.getName());
+        registry.removeBySession(user, session.getId());
         this.removeParticipant(registry, user.getName());
         user.close();
     }
 
     @Override
     public void onError() {
-        //TODO
+        log.error("ExitHandler : Error Occurred");
     }
 
     private void removeParticipant(UserRegistry registry, String name) throws IOException {
