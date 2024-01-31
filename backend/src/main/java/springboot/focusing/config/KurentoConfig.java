@@ -70,7 +70,7 @@ public class KurentoConfig implements WebSocketConfigurer {
         return container;
     }
 
-    // signal 로 요청이 왔을 때 아래의 WebSockerHandler 가 동작하도록 registry 에 설정
+    // signal 로 요청이 왔을 때 아래의 WebSocketHandler 가 동작하도록 registry 에 설정
     // 요청은 클라이언트 접속, close, 메시지 발송 등에 대해 특정 메서드를 호출한다
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
