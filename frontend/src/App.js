@@ -57,7 +57,6 @@ function App() {
           console.error('Unrecognized message', parsedMessage);
       }
     };
-
   }, []);
 
   return (
