@@ -2,8 +2,7 @@
 대규모 다중 화상 채팅 서비스 환경을 위한, WebRTC(SFU) 통신 방식을 구현한  프로젝트입니다.
 
 ## Architecture Structure
-
-![Untitled](https://prod-files-secure.s3.us-west-2.amazonaws.com/74c60207-9b86-43fc-81c9-e1902c5bfb35/97d70baf-abe5-412c-8922-5da270d307ea/Untitled.png)
+![image](https://github.com/howudong/Face-Out/assets/53307093/b7ee9645-9ed6-4304-988f-cb04fe70d781)
 
 ## 각 기술 스택 설명 및 선정 이유
 
