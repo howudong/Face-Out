@@ -1,23 +1,35 @@
-import logo from './logo.svg';
+import React, { useEffect, useRef } from 'react';
+import kurentoUtils from 'kurento-utils';
 import './App.css';
 
+const PARTICIPANT_MAIN_CLASS = 'participant main';
+const PARTICIPANT_CLASS = 'participant';
+const WEBSOCKET_URL = process.env.REACT_APP_API_URL
+
+class Participant {
+
+  constructor(name, sendMessage){
+
+  }
+
+
+}
+
+
 function App() {
+  const ws = useRef(null);
+  const participants = {};
+  const name = useRef(null);
+  const room = useRef(null);
+
+
+  useEffect(() => {
+    ws.current = new WebSocket(WEBSOCKET_URL);
+  }, []);
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+
     </div>
   );
 }
