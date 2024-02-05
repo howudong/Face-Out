@@ -11,7 +11,8 @@ import org.springframework.web.socket.server.standard.ServletServerContainerFact
 import springboot.focusing.KurentoHandlerAdapter;
 import springboot.focusing.handler.MainHandler;
 import springboot.focusing.handler.kurento.*;
-import springboot.focusing.service.UserRegistry;
+import springboot.focusing.repository.MemoryUserSessionRepository;
+import springboot.focusing.service.UserSessionService;
 
 import java.util.Map;
 import java.util.Objects;
@@ -26,12 +27,7 @@ public class KurentoConfig implements WebSocketConfigurer {
     @Bean
     public MainHandler createKurentoHandler() {
         KurentoHandlerAdapter kurentoHandlerAdapter = configKurentoHandler();
-        return new MainHandler(kurentoHandlerAdapter, userRegistry());
-    }
-
-    @Bean
-    public UserRegistry userRegistry() {
-        return new UserRegistry();
+        return new MainHandler(kurentoHandlerAdapter, new UserSessionService(new MemoryUserSessionRepository()));
     }
 
     @Bean

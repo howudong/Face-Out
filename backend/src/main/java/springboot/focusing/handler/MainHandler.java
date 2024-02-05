@@ -12,7 +12,8 @@ import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 import springboot.focusing.KurentoHandlerAdapter;
-import springboot.focusing.service.UserRegistry;
+import springboot.focusing.domain.UserSession;
+import springboot.focusing.service.UserSessionService;
 
 import java.io.IOException;
 
@@ -23,7 +24,7 @@ public class MainHandler extends TextWebSocketHandler {
     private static final Gson gson = new GsonBuilder().create();
 
     private final KurentoHandlerAdapter kurentoHandlerAdapter;
-    private final UserRegistry registry;
+    private final UserSessionService userService;
 
     @Override
     public void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
@@ -37,14 +38,16 @@ public class MainHandler extends TextWebSocketHandler {
 
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
-        registry.findBySessionId(session.getId())
-                .ifPresent(userSession -> processExitHandler(session));
+        UserSession userSession = userService.findSession(session);
+        if (userSession != null) {
+            processExitHandler(session);
+        }
     }
 
     private void processExitHandler(WebSocketSession session) {
         KurentoHandler handler = kurentoHandlerAdapter.findHandlerById("exit");
         try {
-            handler.process(session, registry, null);
+            handler.process(session, userService, null);
         } catch (IOException e) {
             handler.onError();
             log.warn("Error Occurred on {}", handler.getClass());
@@ -53,7 +56,7 @@ public class MainHandler extends TextWebSocketHandler {
 
     private void processByHandler(WebSocketSession session, JsonObject jsonMessage, KurentoHandler handler) {
         try {
-            handler.process(session, registry, jsonMessage);
+            handler.process(session, userService, jsonMessage);
         } catch (IOException e) {
             handler.onError();
             log.warn("Error Occurred on {}", handler.getClass());
