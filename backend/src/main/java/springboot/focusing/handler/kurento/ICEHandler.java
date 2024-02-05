@@ -4,21 +4,20 @@ import com.google.gson.JsonObject;
 import lombok.extern.slf4j.Slf4j;
 import org.kurento.client.IceCandidate;
 import org.springframework.web.socket.WebSocketSession;
+import springboot.focusing.domain.UserSession;
 import springboot.focusing.handler.KurentoHandler;
-import springboot.focusing.service.UserRegistry;
+import springboot.focusing.service.UserSessionService;
 
 import java.io.IOException;
 
 @Slf4j
 public class ICEHandler implements KurentoHandler {
     @Override
-    public void process(WebSocketSession session, UserRegistry registry, JsonObject jsonMessage) throws IOException {
+    public void process(WebSocketSession session, UserSessionService userService, JsonObject jsonMessage) throws IOException {
         log.info("ICE Handler Process");
-        registry.findBySessionId(session.getId())
-                .ifPresent(user -> {
-                    IceCandidate candidate = makeIceCandidate(jsonMessage);
-                    user.addCandidate(candidate, jsonMessage.get("name").getAsString());
-                });
+        UserSession userSession = userService.findSession(session.getId());
+        IceCandidate candidate = makeIceCandidate(jsonMessage);
+        userSession.addCandidate(candidate, jsonMessage.get("name").getAsString());
     }
 
     @Override

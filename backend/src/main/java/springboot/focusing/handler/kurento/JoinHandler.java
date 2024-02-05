@@ -10,7 +10,7 @@ import org.kurento.client.MediaPipeline;
 import org.springframework.web.socket.WebSocketSession;
 import springboot.focusing.domain.UserSession;
 import springboot.focusing.handler.KurentoHandler;
-import springboot.focusing.service.UserRegistry;
+import springboot.focusing.service.UserSessionService;
 
 import java.io.IOException;
 
@@ -20,11 +20,11 @@ public class JoinHandler implements KurentoHandler {
     private final MediaPipeline pipeline;
 
     @Override
-    public void process(WebSocketSession session, UserRegistry registry, JsonObject jsonMessage) throws IOException {
+    public void process(WebSocketSession session, UserSessionService userService, JsonObject jsonMessage) throws IOException {
         UserSession user = createUserSession(session, jsonMessage);
-        registry.register(session.getId(), user);
-        notifyOthers(registry, user);
-        sendParticipantNames(registry, user);
+        userService.register(session.getId(), user);
+        notifyOthers(userService, user);
+        sendParticipantNames(userService, user);
     }
 
     @Override
@@ -37,13 +37,13 @@ public class JoinHandler implements KurentoHandler {
         return new UserSession(pipeline, session, name);
     }
 
-    private void notifyOthers(UserRegistry registry, UserSession newParticipant) {
+    private void notifyOthers(UserSessionService registry, UserSession newParticipant) {
         log.info("PARTICIPANT: trying to join room");
         final JsonObject newParticipantMsg = new JsonObject();
         newParticipantMsg.addProperty("id", "newParticipantArrived");
         newParticipantMsg.addProperty("name", newParticipant.getName());
 
-        for (final UserSession participant : registry.getAllSession()) {
+        for (final UserSession participant : registry.findAllUserSession()) {
             try {
                 if (!participant.getName().equals(newParticipant.getName())) {
                     log.info("notify to {} Msg : {} ", participant.getName(), newParticipantMsg);
@@ -57,20 +57,19 @@ public class JoinHandler implements KurentoHandler {
         }
     }
 
-    private void sendParticipantNames(UserRegistry registry, UserSession user) throws IOException {
+    private void sendParticipantNames(UserSessionService registry, UserSession user) throws IOException {
         final JsonArray participantsArray = new JsonArray();
-        for (final UserSession participant : registry.getAllSession()) {
+        for (final UserSession participant : registry.findAllUserSession()) {
             if (!participant.getName().equals(user.getName())) {
                 final JsonElement participantName = new JsonPrimitive(participant.getName());
                 participantsArray.add(participantName);
             }
         }
-
+        
         final JsonObject existingParticipantsMsg = new JsonObject();
         existingParticipantsMsg.addProperty("id", "existingParticipants");
         existingParticipantsMsg.add("data", participantsArray);
-        log.info("PARTICIPANT {}: sending a list of {} participants", user.getName(),
-                participantsArray.size());
+        log.info("PARTICIPANT {}: sending a list of {} participants", user.getName(), participantsArray.size());
         user.sendMessage(existingParticipantsMsg);
     }
 }
