@@ -15,7 +15,7 @@ public class ICEHandler implements KurentoHandler {
     @Override
     public void process(WebSocketSession session, UserSessionService userService, JsonObject jsonMessage) throws IOException {
         log.info("ICE Handler Process");
-        UserSession userSession = userService.findSession(session.getId());
+        UserSession userSession = userService.findSession(session);
         IceCandidate candidate = makeIceCandidate(jsonMessage);
         userSession.addCandidate(candidate, jsonMessage.get("name").getAsString());
     }

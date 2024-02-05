@@ -17,7 +17,7 @@ import java.util.List;
 public class ExitHandler implements KurentoHandler {
     @Override
     public void process(WebSocketSession session, UserSessionService userService, JsonObject jsonMessage) throws IOException {
-        UserSession user = userService.findSession(session.getId());
+        UserSession user = userService.findSession(session);
 
         log.debug("PARTICIPANT {}: exit ", user.getName());
         userService.removeSession(user.getName());
