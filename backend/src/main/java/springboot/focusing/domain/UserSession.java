@@ -118,6 +118,11 @@ public class UserSession implements Closeable {
     public String getName() {
         return name;
     }
+    public boolean isSameSessionId(String sessionId){
+        return this.session
+                .getId()
+                .equals(sessionId);
+    }
 
     @Override
     public void close() throws IOException {
