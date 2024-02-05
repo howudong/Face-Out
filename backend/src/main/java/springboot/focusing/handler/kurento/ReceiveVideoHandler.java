@@ -6,21 +6,20 @@ import org.kurento.client.Continuation;
 import org.springframework.web.socket.WebSocketSession;
 import springboot.focusing.domain.UserSession;
 import springboot.focusing.handler.KurentoHandler;
-import springboot.focusing.service.UserRegistry;
+import springboot.focusing.service.UserSessionService;
 
 import java.io.IOException;
-import java.util.NoSuchElementException;
 
 @Slf4j
 public class ReceiveVideoHandler implements KurentoHandler {
 
     @Override
-    public void process(WebSocketSession session, UserRegistry registry, JsonObject jsonMessage) throws IOException {
+    public void process(WebSocketSession session, UserSessionService userService, JsonObject jsonMessage) throws IOException {
         final String senderName = jsonMessage.get("sender").getAsString();
-        final UserSession sender = findSenderSession(registry, senderName);
+        final UserSession sender = findSenderSession(userService, senderName);
         final String sdpOffer = jsonMessage.get("sdpOffer").getAsString();
 
-        UserSession receiver = findReceiverSession(session, registry);
+        UserSession receiver = findReceiverSession(session, userService);
         sendVideoSdpAnswer(sender, receiver, sdpOffer);
     }
 
@@ -55,17 +54,12 @@ public class ReceiveVideoHandler implements KurentoHandler {
         log.error("ReceiveVideoHandler : Error Occurred");
     }
 
-    private UserSession findSenderSession(UserRegistry registry, String senderName) {
-        return registry
-                .findByName(senderName)
-                .orElseThrow(
-                        () -> new NoSuchElementException("[ReceiveVideoHandler] Can not find sender"));
+    private UserSession findSenderSession(UserSessionService registry, String senderName) {
+        return registry.findSession(senderName);
     }
 
-    private UserSession findReceiverSession(WebSocketSession session, UserRegistry registry) {
-        return registry
-                .findBySessionId(session.getId())
-                .orElseThrow(()
-                        -> new NoSuchElementException("[ReceiveVideoHandler] Can not find receiver"));
+    private UserSession findReceiverSession(WebSocketSession session, UserSessionService registry) {
+        log.debug("try to get ReceiverSession");
+        return registry.findSession(session);
     }
 }
