@@ -1,10 +1,9 @@
 package springboot.focusing.domain;
 
 import com.google.gson.JsonObject;
+import lombok.extern.slf4j.Slf4j;
 import org.kurento.client.*;
 import org.kurento.jsonrpc.JsonUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 
@@ -14,8 +13,8 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 
+@Slf4j
 public class UserSession implements Closeable {
-    private static final Logger log = LoggerFactory.getLogger(UserSession.class);
     private final MediaPipeline mediaPipeline;
     private final WebSocketSession session;
     private final String name;
@@ -118,7 +117,8 @@ public class UserSession implements Closeable {
     public String getName() {
         return name;
     }
-    public boolean isSameSessionId(String sessionId){
+
+    public boolean isSameSessionId(String sessionId) {
         return this.session
                 .getId()
                 .equals(sessionId);
