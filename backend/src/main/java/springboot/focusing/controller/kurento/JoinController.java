@@ -1,9 +1,6 @@
 package springboot.focusing.controller.kurento;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.kurento.client.MediaPipeline;
@@ -11,9 +8,12 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.socket.WebSocketSession;
 import springboot.focusing.controller.KurentoController;
 import springboot.focusing.domain.UserSession;
+import springboot.focusing.dto.JoinDto;
 import springboot.focusing.service.UserSessionService;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 @RequiredArgsConstructor
 @Slf4j
@@ -42,10 +42,7 @@ public class JoinController implements KurentoController {
 
     private void notifyOthers(UserSessionService registry, UserSession newParticipant) {
         log.info("PARTICIPANT: trying to join room");
-        final JsonObject newParticipantMsg = new JsonObject();
-        newParticipantMsg.addProperty("id", "newParticipantArrived");
-        newParticipantMsg.addProperty("name", newParticipant.getName());
-
+        JsonObject newParticipantMsg = createResponse(newParticipant.getName());
         for (final UserSession participant : registry.findAllUserSession()) {
             try {
                 if (!participant.getName().equals(newParticipant.getName())) {
@@ -61,18 +58,25 @@ public class JoinController implements KurentoController {
     }
 
     private void sendParticipantNames(UserSessionService registry, UserSession user) throws IOException {
-        final JsonArray participantsArray = new JsonArray();
+        List<String> usernames = new ArrayList<>();
         for (final UserSession participant : registry.findAllUserSession()) {
             if (!participant.getName().equals(user.getName())) {
-                final JsonElement participantName = new JsonPrimitive(participant.getName());
-                participantsArray.add(participantName);
+                usernames.add(participant.getName());
             }
         }
-
-        final JsonObject existingParticipantsMsg = new JsonObject();
-        existingParticipantsMsg.addProperty("id", "existingParticipants");
-        existingParticipantsMsg.add("data", participantsArray);
-        log.info("PARTICIPANT {}: sending a list of {} participants", user.getName(), participantsArray.size());
+        JsonObject existingParticipantsMsg = createResponse(usernames.toArray(new String[0]));
+        log.info("PARTICIPANT {}: sending a list of {} participants", user.getName(), usernames.size());
         user.sendMessage(existingParticipantsMsg);
+    }
+
+    private JsonObject createResponse(String... usernames) {
+        if (usernames.length == 1) {
+            return new JoinDto
+                    .ExistingUserResponse("newParticipantArrived", usernames[0])
+                    .toJson();
+        }
+        return new JoinDto
+                .NewUserResponse("existingParticipants", List.of(usernames))
+                .toJson();
     }
 }

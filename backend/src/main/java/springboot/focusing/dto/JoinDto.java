@@ -1,24 +1,43 @@
 package springboot.focusing.dto;
 
-import lombok.Builder;
-import lombok.Data;
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 import java.util.List;
 
-@Data
-@Builder
-public class JoinDto {
+public abstract class JoinDto {
+    private static final Gson gson = new Gson();
+
+    @Getter
     public static class Request {
         private String name;
+
+        public JsonObject toJson() {
+            return gson.toJsonTree(this).getAsJsonObject();
+        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     public static class ExistingUserResponse {
-        private String id;
-        private String name;
+        private final String id;
+        private final String name;
+
+        public JsonObject toJson() {
+            return gson.toJsonTree(this).getAsJsonObject();
+        }
     }
 
+    @Getter
+    @RequiredArgsConstructor
     public static class NewUserResponse {
-        private String id;
-        private List<String> names;
+        private final String id;
+        private final List<String> data;
+
+        public JsonObject toJson() {
+            return gson.toJsonTree(this).getAsJsonObject();
+        }
     }
 }
