@@ -19,21 +19,21 @@ import java.io.IOException;
 @Slf4j
 public class WebSocketHandler extends TextWebSocketHandler {
     private static final Gson gson = new GsonBuilder().create();
-    private final KurentoHandlerAdapter kurentoHandlerAdapter;
+    private final KurentoAdapter kurentoAdapter;
 
     @Override
-    public void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
+    public void handleTextMessage(WebSocketSession session, TextMessage message) {
         JsonObject jsonMessage = gson.fromJson(message.getPayload(), JsonObject.class);
         String id = jsonMessage.get("id").getAsString();
         log.info("Receive ID [{}] from {} ", id, session.getId());
 
-        KurentoController findController = kurentoHandlerAdapter.findController(id);
+        KurentoController findController = kurentoAdapter.findController(id);
         processByController(session, jsonMessage, findController);
     }
 
     @Override
-    public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
-        KurentoController controller = kurentoHandlerAdapter.getCloseController();
+    public void afterConnectionClosed(WebSocketSession session, CloseStatus status) {
+        KurentoController controller = kurentoAdapter.getCloseController();
         processByController(session, null, controller);
     }
 

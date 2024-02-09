@@ -4,12 +4,12 @@ import springboot.focusing.controller.KurentoController;
 
 import java.util.Map;
 
-public class KurentoHandlerAdapter {
+public class KurentoAdapter {
     private static final String NOT_MATCH_ID = "error";
     private static final String CLOSE_ID = "exit";
     private final Map<String, KurentoController> hanlderMap;
 
-    public KurentoHandlerAdapter(Map<String, KurentoController> hanlderMap) {
+    public KurentoAdapter(Map<String, KurentoController> hanlderMap) {
         this.hanlderMap = hanlderMap;
     }
 

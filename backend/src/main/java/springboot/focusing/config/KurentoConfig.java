@@ -9,7 +9,7 @@ import org.springframework.web.socket.config.annotation.WebSocketConfigurer;
 import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry;
 import org.springframework.web.socket.server.standard.ServletServerContainerFactoryBean;
 import springboot.focusing.controller.kurento.*;
-import springboot.focusing.handler.KurentoHandlerAdapter;
+import springboot.focusing.handler.KurentoAdapter;
 import springboot.focusing.handler.WebSocketHandler;
 import springboot.focusing.repository.MemoryUserSessionRepository;
 import springboot.focusing.service.UserSessionService;
@@ -26,13 +26,13 @@ public class KurentoConfig implements WebSocketConfigurer {
 
     @Bean
     public WebSocketHandler createKurentoHandler() {
-        KurentoHandlerAdapter kurentoHandlerAdapter = configKurentoHandler();
-        return new WebSocketHandler(kurentoHandlerAdapter);
+        KurentoAdapter kurentoAdapter = configKurentoHandler();
+        return new WebSocketHandler(kurentoAdapter);
     }
 
     @Bean
-    public KurentoHandlerAdapter configKurentoHandler() {
-        return new KurentoHandlerAdapter(
+    public KurentoAdapter configKurentoHandler() {
+        return new KurentoAdapter(
                 Map.of(
                         "join", new JoinController(kurentoClient().createMediaPipeline(), userSessionService()),
                         "onIceCandidate", new ICEController(userSessionService()),
