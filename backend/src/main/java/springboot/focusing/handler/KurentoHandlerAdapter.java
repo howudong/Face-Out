@@ -6,6 +6,7 @@ import java.util.Map;
 
 public class KurentoHandlerAdapter {
     private static final String NOT_MATCH_ID = "error";
+    private static final String CLOSE_ID = "exit";
     private final Map<String, KurentoController> hanlderMap;
 
     public KurentoHandlerAdapter(Map<String, KurentoController> hanlderMap) {
@@ -20,6 +21,6 @@ public class KurentoHandlerAdapter {
     }
 
     public KurentoController getCloseController() {
-        return findController(null);
+        return findController(CLOSE_ID);
     }
 }
