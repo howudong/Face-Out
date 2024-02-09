@@ -1,6 +1,7 @@
 package springboot.focusing.config;
 
 import org.kurento.client.KurentoClient;
+import org.kurento.client.MediaPipeline;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -34,7 +35,7 @@ public class KurentoConfig implements WebSocketConfigurer {
     public KurentoAdapter configKurentoHandler() {
         return new KurentoAdapter(
                 Map.of(
-                        "join", new JoinController(kurentoClient().createMediaPipeline(), userSessionService()),
+                        "join", new JoinController(mediaPipeline(), userSessionService()),
                         "onIceCandidate", new ICEController(userSessionService()),
                         "receiveVideoFrom", new ReceiveVideoController(userSessionService()),
                         "error", new ErrorController(),
@@ -69,6 +70,11 @@ public class KurentoConfig implements WebSocketConfigurer {
         container.setMaxTextMessageBufferSize(32768);
         container.setMaxBinaryMessageBufferSize(32768);
         return container;
+    }
+
+    @Bean
+    public MediaPipeline mediaPipeline() {
+        return kurentoClient().createMediaPipeline();
     }
 
     // signal 로 요청이 왔을 때 아래의 WebSocketHandler 가 동작하도록 registry 에 설정
