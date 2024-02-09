@@ -8,9 +8,9 @@ import org.springframework.web.socket.config.annotation.EnableWebSocket;
 import org.springframework.web.socket.config.annotation.WebSocketConfigurer;
 import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry;
 import org.springframework.web.socket.server.standard.ServletServerContainerFactoryBean;
-import springboot.focusing.KurentoHandlerAdapter;
-import springboot.focusing.handler.MainHandler;
-import springboot.focusing.handler.kurento.*;
+import springboot.focusing.controller.kurento.*;
+import springboot.focusing.handler.KurentoHandlerAdapter;
+import springboot.focusing.handler.WebSocketHandler;
 import springboot.focusing.repository.MemoryUserSessionRepository;
 import springboot.focusing.service.UserSessionService;
 
@@ -25,20 +25,20 @@ public class KurentoConfig implements WebSocketConfigurer {
     private String kmsUrl;
 
     @Bean
-    public MainHandler createKurentoHandler() {
+    public WebSocketHandler createKurentoHandler() {
         KurentoHandlerAdapter kurentoHandlerAdapter = configKurentoHandler();
-        return new MainHandler(kurentoHandlerAdapter, new UserSessionService(new MemoryUserSessionRepository()));
+        return new WebSocketHandler(kurentoHandlerAdapter, new UserSessionService(new MemoryUserSessionRepository()));
     }
 
     @Bean
     public KurentoHandlerAdapter configKurentoHandler() {
         return new KurentoHandlerAdapter(
                 Map.of(
-                        "join", new JoinHandler(kurentoClient().createMediaPipeline()),
-                        "onIceCandidate", new ICEHandler(),
-                        "receiveVideoFrom", new ReceiveVideoHandler(),
-                        "error", new ErrorHandler(),
-                        "exit", new ExitHandler()));
+                        "join", new JoinController(kurentoClient().createMediaPipeline()),
+                        "onIceCandidate", new ICEController(),
+                        "receiveVideoFrom", new ReceiveVideoController(),
+                        "error", new ErrorController(),
+                        "exit", new ExitController()));
     }
 
     /*

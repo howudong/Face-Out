@@ -1,11 +1,11 @@
-package springboot.focusing.handler.kurento;
+package springboot.focusing.controller.kurento;
 
 import com.google.gson.JsonObject;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.socket.WebSocketSession;
+import springboot.focusing.controller.KurentoController;
 import springboot.focusing.domain.UserSession;
-import springboot.focusing.handler.KurentoHandler;
 import springboot.focusing.service.UserSessionService;
 
 import java.io.IOException;
@@ -14,7 +14,7 @@ import java.util.List;
 
 @Slf4j
 @RequiredArgsConstructor
-public class ExitHandler implements KurentoHandler {
+public class ExitController implements KurentoController {
     @Override
     public void process(WebSocketSession session, UserSessionService userService, JsonObject jsonMessage) throws IOException {
         UserSession user = userService.findSession(session);

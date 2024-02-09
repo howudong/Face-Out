@@ -1,4 +1,4 @@
-package springboot.focusing.handler;
+package springboot.focusing.controller;
 
 import com.google.gson.JsonObject;
 import org.springframework.stereotype.Component;
@@ -8,7 +8,7 @@ import springboot.focusing.service.UserSessionService;
 import java.io.IOException;
 
 @Component
-public interface KurentoHandler {
+public interface KurentoController {
     void process(WebSocketSession session, UserSessionService userService, JsonObject jsonMessage) throws IOException;
 
     void onError();

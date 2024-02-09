@@ -1,4 +1,4 @@
-package springboot.focusing.handler.kurento;
+package springboot.focusing.controller.kurento;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -8,15 +8,15 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.kurento.client.MediaPipeline;
 import org.springframework.web.socket.WebSocketSession;
+import springboot.focusing.controller.KurentoController;
 import springboot.focusing.domain.UserSession;
-import springboot.focusing.handler.KurentoHandler;
 import springboot.focusing.service.UserSessionService;
 
 import java.io.IOException;
 
 @RequiredArgsConstructor
 @Slf4j
-public class JoinHandler implements KurentoHandler {
+public class JoinController implements KurentoController {
     private final MediaPipeline pipeline;
 
     @Override
@@ -65,7 +65,7 @@ public class JoinHandler implements KurentoHandler {
                 participantsArray.add(participantName);
             }
         }
-        
+
         final JsonObject existingParticipantsMsg = new JsonObject();
         existingParticipantsMsg.addProperty("id", "existingParticipants");
         existingParticipantsMsg.add("data", participantsArray);

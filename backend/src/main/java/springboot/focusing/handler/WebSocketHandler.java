@@ -11,16 +11,15 @@ import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
-import springboot.focusing.KurentoHandlerAdapter;
-import springboot.focusing.domain.UserSession;
+import springboot.focusing.controller.KurentoController;
 import springboot.focusing.service.UserSessionService;
 
 import java.io.IOException;
 
 @Component
 @RequiredArgsConstructor
-public class MainHandler extends TextWebSocketHandler {
-    private static final Logger log = LoggerFactory.getLogger(MainHandler.class);
+public class WebSocketHandler extends TextWebSocketHandler {
+    private static final Logger log = LoggerFactory.getLogger(WebSocketHandler.class);
     private static final Gson gson = new GsonBuilder().create();
 
     private final KurentoHandlerAdapter kurentoHandlerAdapter;
@@ -32,34 +31,22 @@ public class MainHandler extends TextWebSocketHandler {
         String id = jsonMessage.get("id").getAsString();
         log.info("Receive ID [{}] from {} ", id, session.getId());
 
-        KurentoHandler findHandler = kurentoHandlerAdapter.findHandlerById(id);
-        processByHandler(session, jsonMessage, findHandler);
+        KurentoController findController = kurentoHandlerAdapter.findController(id);
+        processByController(session, jsonMessage, findController);
     }
 
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
-        UserSession userSession = userService.findSession(session);
-        if (userSession != null) {
-            processExitHandler(session);
-        }
+        KurentoController controller = kurentoHandlerAdapter.getCloseController();
+        processByController(session, null, controller);
     }
 
-    private void processExitHandler(WebSocketSession session) {
-        KurentoHandler handler = kurentoHandlerAdapter.findHandlerById("exit");
+    private void processByController(WebSocketSession session, JsonObject jsonMessage, KurentoController controller) {
         try {
-            handler.process(session, userService, null);
+            controller.process(session, userService, jsonMessage);
         } catch (IOException e) {
-            handler.onError();
-            log.warn("Error Occurred on {}", handler.getClass());
-        }
-    }
-
-    private void processByHandler(WebSocketSession session, JsonObject jsonMessage, KurentoHandler handler) {
-        try {
-            handler.process(session, userService, jsonMessage);
-        } catch (IOException e) {
-            handler.onError();
-            log.warn("Error Occurred on {}", handler.getClass());
+            controller.onError();
+            log.warn("Error Occurred on {}", controller.getClass());
         }
     }
 }
