@@ -27,18 +27,23 @@ public class KurentoConfig implements WebSocketConfigurer {
     @Bean
     public WebSocketHandler createKurentoHandler() {
         KurentoHandlerAdapter kurentoHandlerAdapter = configKurentoHandler();
-        return new WebSocketHandler(kurentoHandlerAdapter, new UserSessionService(new MemoryUserSessionRepository()));
+        return new WebSocketHandler(kurentoHandlerAdapter);
     }
 
     @Bean
     public KurentoHandlerAdapter configKurentoHandler() {
         return new KurentoHandlerAdapter(
                 Map.of(
-                        "join", new JoinController(kurentoClient().createMediaPipeline()),
-                        "onIceCandidate", new ICEController(),
-                        "receiveVideoFrom", new ReceiveVideoController(),
+                        "join", new JoinController(kurentoClient().createMediaPipeline(), userSessionService()),
+                        "onIceCandidate", new ICEController(userSessionService()),
+                        "receiveVideoFrom", new ReceiveVideoController(userSessionService()),
                         "error", new ErrorController(),
-                        "exit", new ExitController()));
+                        "exit", new ExitController(userSessionService())));
+    }
+
+    @Bean
+    public UserSessionService userSessionService() {
+        return new UserSessionService(new MemoryUserSessionRepository());
     }
 
     /*

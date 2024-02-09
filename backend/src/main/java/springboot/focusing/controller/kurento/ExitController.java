@@ -3,6 +3,7 @@ package springboot.focusing.controller.kurento;
 import com.google.gson.JsonObject;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.socket.WebSocketSession;
 import springboot.focusing.controller.KurentoController;
 import springboot.focusing.domain.UserSession;
@@ -14,11 +15,13 @@ import java.util.List;
 
 @Slf4j
 @RequiredArgsConstructor
+@Controller
 public class ExitController implements KurentoController {
-    @Override
-    public void process(WebSocketSession session, UserSessionService userService, JsonObject jsonMessage) throws IOException {
-        UserSession user = userService.findSession(session);
+    private final UserSessionService userService;
 
+    @Override
+    public void process(WebSocketSession session, JsonObject jsonMessage) throws IOException {
+        UserSession user = userService.findSession(session);
         log.debug("PARTICIPANT {}: exit ", user.getName());
         userService.removeSession(user.getName());
         this.removeParticipant(userService, user.getName());

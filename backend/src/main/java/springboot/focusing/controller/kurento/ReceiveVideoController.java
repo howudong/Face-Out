@@ -1,8 +1,10 @@
 package springboot.focusing.controller.kurento;
 
 import com.google.gson.JsonObject;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.kurento.client.Continuation;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.socket.WebSocketSession;
 import springboot.focusing.controller.KurentoController;
 import springboot.focusing.domain.UserSession;
@@ -11,10 +13,13 @@ import springboot.focusing.service.UserSessionService;
 import java.io.IOException;
 
 @Slf4j
+@Controller
+@RequiredArgsConstructor
 public class ReceiveVideoController implements KurentoController {
+    private final UserSessionService userService;
 
     @Override
-    public void process(WebSocketSession session, UserSessionService userService, JsonObject jsonMessage) throws IOException {
+    public void process(WebSocketSession session, JsonObject jsonMessage) throws IOException {
         final String senderName = jsonMessage.get("sender").getAsString();
         final UserSession sender = findSenderSession(userService, senderName);
         final String sdpOffer = jsonMessage.get("sdpOffer").getAsString();
