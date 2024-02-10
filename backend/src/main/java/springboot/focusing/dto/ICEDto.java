@@ -25,6 +25,5 @@ public abstract class ICEDto implements KurentoDto {
         private String candidate;
         private String sdpMid;
         private int sdpMLineIndex;
-
     }
 }
