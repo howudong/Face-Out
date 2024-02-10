@@ -8,6 +8,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.socket.WebSocketSession;
 import springboot.focusing.controller.KurentoController;
 import springboot.focusing.domain.UserSession;
+import springboot.focusing.dto.ReceiveVideoDto;
 import springboot.focusing.service.UserSessionService;
 
 import java.io.IOException;
@@ -32,13 +33,15 @@ public class ReceiveVideoController implements KurentoController {
         log.info("USER {}: SdpOffer for {} receiveVideoFrom", receiver.getName(), sender.getName());
 
         final String ipSdpAnswer = receiver.getEndpointForUser(sender).processOffer(sdpOffer);
-        final JsonObject scParams = new JsonObject();
-        scParams.addProperty("id", "receiveVideoAnswer");
-        scParams.addProperty("name", sender.getName());
-        scParams.addProperty("sdpAnswer", ipSdpAnswer);
+        final JsonObject recvVideoResponse = getRecvVideoResponeDto(sender, ipSdpAnswer);
 
         log.info("USER {}: SdpAnswer for {} receiveVideoAnswer", receiver.getName(), sender.getName());
-        receiver.sendMessage(scParams);
+        receiver.sendMessage(recvVideoResponse);
+        
+        startGatherCandidates(sender, receiver);
+    }
+
+    private void startGatherCandidates(UserSession sender, UserSession receiver) {
         log.info("gather candidates");
         receiver.getEndpointForUser(sender).gatherCandidates(new Continuation<Void>() {
             @Override
@@ -66,5 +69,11 @@ public class ReceiveVideoController implements KurentoController {
     private UserSession findReceiverSession(WebSocketSession session, UserSessionService registry) {
         log.debug("try to get ReceiverSession");
         return registry.findSession(session);
+    }
+
+    private JsonObject getRecvVideoResponeDto(UserSession sender, String ipSdpAnswer) {
+        return new ReceiveVideoDto
+                .Response("receiveVideoAnswer", sender.getName(), ipSdpAnswer)
+                .toJson();
     }
 }

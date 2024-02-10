@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import springboot.focusing.controller.KurentoController;
+import springboot.focusing.dto.ErrorDto;
 
 import java.io.IOException;
 
@@ -12,14 +13,18 @@ import java.io.IOException;
 public class ErrorController implements KurentoController {
     @Override
     public void process(WebSocketSession session, JsonObject jsonMessage) throws IOException {
-        JsonObject response = new JsonObject();
-        response.addProperty("id", "error");
-        response.addProperty("message", "Invalid Message");
+        JsonObject response = getErrorDtoJson();
         session.sendMessage(new TextMessage(response.toString()));
     }
 
     @Override
     public void onError() {
         log.error("ErrorHandler : Error Occurred");
+    }
+
+    private JsonObject getErrorDtoJson() {
+        return new ErrorDto
+                .Response("error", "Invalid Message")
+                .toJson();
     }
 }

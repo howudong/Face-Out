@@ -7,6 +7,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.socket.WebSocketSession;
 import springboot.focusing.controller.KurentoController;
 import springboot.focusing.domain.UserSession;
+import springboot.focusing.dto.ExitDto;
 import springboot.focusing.service.UserSessionService;
 
 import java.io.IOException;
@@ -37,9 +38,8 @@ public class ExitController implements KurentoController {
         log.debug("notifying all users that {} is leaving the room", name);
 
         final List<String> unnoticedParticipants = new ArrayList<>();
-        final JsonObject participantLeftJson = new JsonObject();
-        participantLeftJson.addProperty("id", "participantExit");
-        participantLeftJson.addProperty("name", name);
+        final JsonObject participantLeftJson = getExitResponseDtoJson(name);
+
         for (final UserSession participant : registry.findAllUserSession()) {
             try {
                 participant.cancelVideoFrom(name);
@@ -53,5 +53,11 @@ public class ExitController implements KurentoController {
             log.debug("The users {} could not be notified that {} left the room",
                     unnoticedParticipants, name);
         }
+    }
+
+    private JsonObject getExitResponseDtoJson(String name) {
+        return new ExitDto
+                .Response("participantExit", name)
+                .toJson();
     }
 }
