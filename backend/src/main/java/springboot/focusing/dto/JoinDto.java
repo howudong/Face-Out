@@ -8,6 +8,7 @@ import java.util.List;
 public abstract class JoinDto implements KurentoDto {
     @Getter
     public static class Request extends JoinDto {
+        private String id;
         private String name;
 
     }
