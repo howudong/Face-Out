@@ -36,8 +36,11 @@ public class JoinController implements KurentoController {
     }
 
     private UserSession createUserSession(WebSocketSession session, JsonObject jsonMessage) {
-        String name = jsonMessage.get("name").getAsString();
-        return new UserSession(pipeline, session, name);
+        JoinDto.Request requestDto = new JoinDto
+                .Request()
+                .toDto(jsonMessage, JoinDto.Request.class);
+        
+        return new UserSession(pipeline, session, requestDto.getName());
     }
 
     private void notifyOthers(UserSessionService registry, UserSession newParticipant) {

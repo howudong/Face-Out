@@ -21,9 +21,13 @@ public class ReceiveVideoController implements KurentoController {
 
     @Override
     public void process(WebSocketSession session, JsonObject jsonMessage) throws IOException {
-        final String senderName = jsonMessage.get("sender").getAsString();
+        ReceiveVideoDto.Request requestDto = new ReceiveVideoDto
+                .Request()
+                .toDto(jsonMessage, ReceiveVideoDto.Request.class);
+        
+        final String senderName = requestDto.getSender();
+        final String sdpOffer = requestDto.getSdpOffer();
         final UserSession sender = findSenderSession(userService, senderName);
-        final String sdpOffer = jsonMessage.get("sdpOffer").getAsString();
 
         UserSession receiver = findReceiverSession(session, userService);
         sendVideoSdpAnswer(sender, receiver, sdpOffer);

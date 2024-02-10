@@ -5,9 +5,10 @@ import lombok.RequiredArgsConstructor;
 
 public abstract class ICEDto implements KurentoDto {
     @Getter
-    @RequiredArgsConstructor
     public static class Request extends ICEDto {
-        private String candidate;
+        private String id;
+        private String name;
+        private CandidateDto candidate;
     }
 
     @Getter
@@ -16,5 +17,12 @@ public abstract class ICEDto implements KurentoDto {
         private final String candidate;
         private final String sdpMid;
         private final int sdpMLineIndex;
+    }
+
+    @Getter
+    public static class CandidateDto {
+        private String candidate;
+        private String sdpMid;
+        private int sdpMLineIndex;
     }
 }

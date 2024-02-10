@@ -9,4 +9,8 @@ public interface KurentoDto {
     default JsonObject toJson() {
         return gson.toJsonTree(this).getAsJsonObject();
     }
+
+    default <T extends KurentoDto> T toDto(JsonObject jsonObject, Class<? extends T> targetClass) {
+        return gson.fromJson(jsonObject, targetClass);
+    }
 }
