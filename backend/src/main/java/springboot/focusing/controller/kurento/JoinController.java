@@ -71,10 +71,18 @@ public class JoinController implements KurentoController {
 
     private JsonObject createResponse(String... usernames) {
         if (usernames.length == 1) {
-            return new JoinDto
-                    .ExistingUserResponse("newParticipantArrived", usernames[0])
-                    .toJson();
+            return getNewParticipantDto(usernames);
         }
+        return getExistingParticipantDto(usernames);
+    }
+
+    private JsonObject getNewParticipantDto(String[] usernames) {
+        return new JoinDto
+                .ExistingUserResponse("newParticipantArrived", usernames[0])
+                .toJson();
+    }
+
+    private JsonObject getExistingParticipantDto(String[] usernames) {
         return new JoinDto
                 .NewUserResponse("existingParticipants", List.of(usernames))
                 .toJson();
