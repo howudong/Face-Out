@@ -1,6 +1,7 @@
 package springboot.focusing.config;
 
 import org.kurento.client.KurentoClient;
+import org.kurento.client.MediaPipeline;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -8,10 +9,11 @@ import org.springframework.web.socket.config.annotation.EnableWebSocket;
 import org.springframework.web.socket.config.annotation.WebSocketConfigurer;
 import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry;
 import org.springframework.web.socket.server.standard.ServletServerContainerFactoryBean;
-import springboot.focusing.KurentoHandlerAdapter;
-import springboot.focusing.handler.MainHandler;
-import springboot.focusing.handler.kurento.*;
-import springboot.focusing.service.UserRegistry;
+import springboot.focusing.controller.kurento.*;
+import springboot.focusing.handler.KurentoAdapter;
+import springboot.focusing.handler.WebSocketHandler;
+import springboot.focusing.repository.MemoryUserSessionRepository;
+import springboot.focusing.service.UserSessionService;
 
 import java.util.Map;
 import java.util.Objects;
@@ -24,25 +26,25 @@ public class KurentoConfig implements WebSocketConfigurer {
     private String kmsUrl;
 
     @Bean
-    public MainHandler createKurentoHandler() {
-        KurentoHandlerAdapter kurentoHandlerAdapter = configKurentoHandler();
-        return new MainHandler(kurentoHandlerAdapter, userRegistry());
+    public WebSocketHandler createKurentoHandler() {
+        KurentoAdapter kurentoAdapter = configKurentoHandler();
+        return new WebSocketHandler(kurentoAdapter);
     }
 
     @Bean
-    public UserRegistry userRegistry() {
-        return new UserRegistry();
-    }
-
-    @Bean
-    public KurentoHandlerAdapter configKurentoHandler() {
-        return new KurentoHandlerAdapter(
+    public KurentoAdapter configKurentoHandler() {
+        return new KurentoAdapter(
                 Map.of(
-                        "join", new JoinHandler(kurentoClient().createMediaPipeline()),
-                        "onIceCandidate", new ICEHandler(),
-                        "receiveVideoFrom", new ReceiveVideoHandler(),
-                        "error", new ErrorHandler(),
-                        "exit", new ExitHandler()));
+                        "join", new JoinController(mediaPipeline(), userSessionService()),
+                        "onIceCandidate", new ICEController(userSessionService()),
+                        "receiveVideoFrom", new ReceiveVideoController(userSessionService()),
+                        "error", new ErrorController(),
+                        "exit", new ExitController(userSessionService())));
+    }
+
+    @Bean
+    public UserSessionService userSessionService() {
+        return new UserSessionService(new MemoryUserSessionRepository());
     }
 
     /*
@@ -68,6 +70,11 @@ public class KurentoConfig implements WebSocketConfigurer {
         container.setMaxTextMessageBufferSize(32768);
         container.setMaxBinaryMessageBufferSize(32768);
         return container;
+    }
+
+    @Bean
+    public MediaPipeline mediaPipeline() {
+        return kurentoClient().createMediaPipeline();
     }
 
     // signal 로 요청이 왔을 때 아래의 WebSocketHandler 가 동작하도록 registry 에 설정
