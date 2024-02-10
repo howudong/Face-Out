@@ -69,22 +69,22 @@ public class UserSession implements Closeable {
     }
 
     public WebRtcEndpoint getEndpointForUser(final UserSession sender) {
-        if (sender.getName().equals(name)) {
+        if (sender.name.equals(name)) {
             log.info("PARTICIPANT {}: configuring loopback", this.name);
             return outgoingMedia;
         }
 
-        log.info("PARTICIPANT {}: receiving video from {}", this.name, sender.getName());
+        log.info("PARTICIPANT {}: receiving video from {}", this.name, sender.name);
 
-        WebRtcEndpoint incoming = incomingMedia.get(sender.getName());
+        WebRtcEndpoint incoming = incomingMedia.get(sender.name);
         if (incoming == null) {
-            log.info("PARTICIPANT {}: creating new endpoint for {}", this.name, sender.getName());
+            log.info("PARTICIPANT {}: creating new endpoint for {}", this.name, sender.name);
             incoming = new WebRtcEndpoint.Builder(mediaPipeline).useDataChannels().build();
-            incoming.addIceCandidateFoundListener(event -> makeIceJson(event, sender.getName()));
-            incomingMedia.put(sender.getName(), incoming);
+            incoming.addIceCandidateFoundListener(event -> makeIceJson(event, sender.name));
+            incomingMedia.put(sender.name, incoming);
         }
 
-        log.info("PARTICIPANT {}: obtained endpoint for {}", this.name, sender.getName());
+        log.info("PARTICIPANT {}: obtained endpoint for {}", this.name, sender.name);
         connectPeer(sender, incoming);
         return incoming;
     }
@@ -98,24 +98,7 @@ public class UserSession implements Closeable {
             log.warn("incoming related to {} is not found", senderName);
             return;
         }
-        incoming.release(new Continuation<Void>() {
-            @Override
-            public void onSuccess(Void result) throws Exception {
-                log.info("PARTICIPANT {}: Released successfully incoming EP for {}",
-                        UserSession.this.name, senderName);
-            }
-
-            @Override
-            public void onError(Throwable cause) throws Exception {
-                log.warn("PARTICIPANT {}: Could not release incoming EP for {}",
-                        UserSession.this.name,
-                        senderName);
-            }
-        });
-    }
-
-    public String getName() {
-        return name;
+        checkIfSuccess(senderName, incoming);
     }
 
     public boolean isSameSessionId(String sessionId) {
@@ -124,6 +107,7 @@ public class UserSession implements Closeable {
                 .equals(sessionId);
     }
 
+
     @Override
     public void close() throws IOException {
         log.debug("PARTICIPANT {}: Releasing resources", this.name);
@@ -131,19 +115,7 @@ public class UserSession implements Closeable {
             log.trace("PARTICIPANT {}: Released incoming EP for {}", this.name, remoteParticipantName);
             final WebRtcEndpoint ep = this.incomingMedia.get(remoteParticipantName);
 
-            ep.release(new Continuation<Void>() {
-                @Override
-                public void onSuccess(Void result) throws Exception {
-                    log.info("PARTICIPANT {}: Released successfully incoming EP for {}",
-                            UserSession.this.name, remoteParticipantName);
-                }
-
-                @Override
-                public void onError(Throwable cause) throws Exception {
-                    log.warn("PARTICIPANT {}: Could not release incoming EP for {}", UserSession.this.name,
-                            remoteParticipantName);
-                }
-            });
+            checkIfSuccess(remoteParticipantName, ep);
         }
         outgoingMedia.release(new Continuation<Void>() {
             @Override
@@ -158,6 +130,10 @@ public class UserSession implements Closeable {
         });
     }
 
+    public String getName() {
+        return name;
+    }
+
     private void makeIceJson(IceCandidateFoundEvent event, String username) {
         JsonObject response = new JsonObject();
         response.addProperty("id", "iceCandidate");
@@ -170,5 +146,22 @@ public class UserSession implements Closeable {
         } catch (IOException e) {
             log.debug(e.getMessage());
         }
+    }
+
+    private void checkIfSuccess(String senderName, WebRtcEndpoint endpoint) {
+        endpoint.release(new Continuation<>() {
+            @Override
+            public void onSuccess(Void result) throws Exception {
+                log.info("PARTICIPANT {}: Released successfully incoming EP for {}",
+                        UserSession.this.name, senderName);
+            }
+
+            @Override
+            public void onError(Throwable cause) throws Exception {
+                log.warn("PARTICIPANT {}: Could not release incoming EP for {}",
+                        UserSession.this.name,
+                        senderName);
+            }
+        });
     }
 }
