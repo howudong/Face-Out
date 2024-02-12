@@ -1,0 +1,142 @@
+#container{
+    position: absolute;
+    background-color: #008507;
+    /* background-color: #18e522; */
+  
+    top : 50%;
+    left : 50%;
+    transform: translate(-50%, -50%);
+    width : fit-content;
+    height : 200px;
+    border: 5px;
+    border-radius: 10px;
+  }
+  .title{
+    position: relative;
+    /* background-color: RED; */
+    width: 100%;
+    height: 10%;
+    display: flex;
+    font-size: 20px;
+    top : 10%;
+    left : 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #002602;
+    font-weight: bold;
+    font-size: 37px;
+  }
+  #name{
+    position: relative;
+    width: 500px;
+    height: 40px;
+    display: flex;
+    font-size: 20px;
+    top : 40%;
+    left : 50%;
+    transform: translate(-50%, -50%);
+    outline: none;
+    border-radius: 4px;
+    border : none;
+    padding: 5px;
+    color: #008507;
+    font-weight: bold;
+    text-align: center;
+  }
+  #roomName{
+    /* position: relative;
+    width: 500px;
+    height: 40px;
+    display: flex;
+    font-size: 20px;
+    top : 37%;
+    left : 50%;
+    transform: translate(-50%, -50%);
+    outline: none;
+    border-radius: 4px;
+    border : none;
+    padding: 5px;
+    color: #008507;
+    font-weight: bold;
+    text-align: center; */
+    display: none;
+  }
+  #registerBtn{
+    position: relative;
+    width: 510px;
+    height: 50px;
+    display: flex;
+    font-size: 20px;
+    top : 65%;
+    left : 50%;
+    transform: translate(-50%, -50%);
+    border-radius: 4px;
+    border : none;
+    padding: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #013d04;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+  }
+  #registerBtn:hover{
+    background-color: #002602;
+    color: rgb(147, 147, 147);
+  }
+  
+  #leaveBtn{
+    position: absolute;
+    width: 510px;
+    height: 50px;
+    display: flex;
+    font-size: 20px;
+    top : 90%;
+    left : 50%;
+    transform: translate(-50%, -50%);
+    border-radius: 4px;
+    border : none;
+    padding: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #013d04;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    visibility: hidden;
+  }
+  #leaveBtn:hover{
+    background-color: #002602;
+    color: rgb(147, 147, 147);
+  }
+  
+  /*비디오 관련*/
+  #participants {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-evenly;
+  }
+  
+  #participants div{
+    display: block;
+    margin-top: 20px;
+    /* margin-bottom: 200px; */
+  
+  }
+  
+  #participants span{
+    position: absolute;
+    font-size: 13px;
+    background-color: #013d04;
+    width: 320px;
+    height: 25px;
+    color: #ffffff;
+    font-weight: bold;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
