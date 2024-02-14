@@ -60,3 +60,8 @@
 - `Github-Action`
     - AWS EC2 서버에 지속적인 배포를 위한 기술로써 사용(CI/CD)
     - jenkins 보다 빠른 속도와 쉬운 조작을 제공
+
+<br><br>
+## 동작 사진
+![alt text](그림3.png)
+![alt text](그림4.png)
