@@ -23,7 +23,7 @@ public class UserSessionService implements Closeable {
         UserSession findUser = userSessionRepository.findByName(username);
         if (findUser == null) {
             log.error("Can't find User by name");
-            throw new NoSuchElementException("해당 유저를 찾을 수 없음");
+            throw new NoSuchElementException("CAN NOT FIND TARGET USER");
         }
         return findUser;
     }
@@ -32,14 +32,18 @@ public class UserSessionService implements Closeable {
         UserSession findUser = userSessionRepository.findBySessionId(session.getId());
         if (findUser == null) {
             log.error("Can't find User by session");
-            throw new NoSuchElementException("해당 유저를 찾을 수 없음");
+            throw new NoSuchElementException("CAN NOT FIND TARGET USER");
         }
         return findUser;
     }
 
     public void removeSession(String name) throws NoSuchElementException {
+        UserSession findUser = userSessionRepository.findByName(name);
+        if (findUser == null) {
+            log.error("Can't find User by session");
+            throw new NoSuchElementException("CAN NOT FIND TARGET USER");
+        }
         userSessionRepository.remove(name);
-        throw new NoSuchElementException();
     }
 
     public void register(String id, UserSession user) {

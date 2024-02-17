@@ -6,6 +6,7 @@ import org.kurento.client.*;
 import org.kurento.jsonrpc.JsonUtils;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
+import springboot.focusing.dto.ICEDto;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -42,12 +43,8 @@ public class UserSession implements Closeable {
         }
     }
 
-    public WebRtcEndpoint getOutgoingMedia() {
-        return outgoingMedia;
-    }
-
     public void connectPeer(UserSession sender, WebRtcEndpoint incoming) {
-        sender.getOutgoingMedia().connect(incoming, new Continuation<Void>() {
+        sender.outgoingMedia.connect(incoming, new Continuation<Void>() {
             @Override
             public void onSuccess(Void result) throws Exception {
                 log.info("connectPeer Success with name : {}", incoming.getName());
@@ -68,6 +65,15 @@ public class UserSession implements Closeable {
         }
     }
 
+    public void addNewIncomingMedia(UserSession sender, WebRtcEndpoint newIncoming) {
+        if (incomingMedia.containsKey(sender.name)) {
+            log.warn("[ADD FAIL] PARTICIPANT {} already exist", sender.name);
+            return;
+        }
+        log.info("PARTICIPANT {}: obtained endpoint for {}", this.name, sender.name);
+        connectPeer(sender, newIncoming);
+    }
+
     public WebRtcEndpoint getEndpointForUser(final UserSession sender) {
         if (sender.name.equals(name)) {
             log.info("PARTICIPANT {}: configuring loopback", this.name);
@@ -83,9 +89,8 @@ public class UserSession implements Closeable {
             incoming.addIceCandidateFoundListener(event -> makeIceJson(event, sender.name));
             incomingMedia.put(sender.name, incoming);
         }
-
-        log.info("PARTICIPANT {}: obtained endpoint for {}", this.name, sender.name);
-        connectPeer(sender, incoming);
+        
+        addNewIncomingMedia(sender, incoming);
         return incoming;
     }
 
@@ -107,6 +112,10 @@ public class UserSession implements Closeable {
                 .equals(sessionId);
     }
 
+
+    public String getName() {
+        return name;
+    }
 
     @Override
     public void close() throws IOException {
@@ -130,19 +139,14 @@ public class UserSession implements Closeable {
         });
     }
 
-    public String getName() {
-        return name;
-    }
-
     private void makeIceJson(IceCandidateFoundEvent event, String username) {
-        JsonObject response = new JsonObject();
-        response.addProperty("id", "iceCandidate");
-        response.addProperty("name", username);
-        response.add("candidate", JsonUtils.toJsonObject(event.getCandidate()));
+        JsonObject candidate = JsonUtils.toJsonObject(event.getCandidate());
+        JsonObject responseDto = new ICEDto
+                .Response("iceCandidate", username, candidate)
+                .toJson();
+
         try {
-            synchronized (session) {
-                session.sendMessage(new TextMessage(response.toString()));
-            }
+            sendMessage(responseDto);
         } catch (IOException e) {
             log.debug(e.getMessage());
         }
