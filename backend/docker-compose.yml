@@ -3,7 +3,7 @@ services:
   kurento:
     image: kurento/kurento-media-server:7.0.0
     volumes:
-      - $HOME/focusing/volume/kurento:/data
+      - $HOME/Face-Out/volume/kurento:/data
     network_mode: host
     environment:
       - KMS_STUN_IP=23.21.150.121
@@ -18,7 +18,7 @@ services:
       service nginx start 
       sleep infinity"
     volumes:
-      - $HOME/focusing/volume/nginx:/data
+      - $HOME/Face-Out/volume/nginx:/data
     ports:
       - "80:80"
       - "443:443"
