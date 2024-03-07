@@ -1,0 +1,24 @@
+version: '3.7'
+services:
+  kurento:
+    image: kurento/kurento-media-server:7.0.0
+    volumes:
+      - $HOME/Face-Out/backend/volume/kurento:/data
+    network_mode: host
+    environment:
+      - KMS_STUN_IP:23.21.150.121
+      - KMS_STUN_PORT:3478
+      - KMS_EXTERNAL_IPV4=3.39.179.45
+      - KMS_TURN_URL:192.158.29.39:3478
+  nginx:
+    image: nginx:latest
+    command: |
+      /bin/bash -c "
+      cp -f data/default.conf etc/nginx/conf.d/default.conf 
+      service nginx start 
+      sleep infinity"
+    volumes:
+      - $HOME/Face-Out/backend/volume/nginx:/data
+    ports:
+      - "80:80"
+      - "443:443"

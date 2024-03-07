@@ -1,7 +1,7 @@
 name: deploy
 on:
   push:
-    branches: ['develop']
+    branches: [ 'develop','features/#1' ]
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -18,3 +18,15 @@ jobs:
           port: ${{ secrets.REMOTE_SSH_PORT }}
           script: |
             whoami
+            echo '17539' | sudo -s chmod 777 /var/run/docker.sock
+            cd focusing/
+            docker-compose down
+            sudo fuser -k 32000/tcp
+            sudo fuser -k 443/tcp
+            git stash
+            git remote update
+            git fetch
+            git pull origin ${{ github.ref_name }}
+            docker-compose up -d
+            echo '17539' | sudo -s ./gradlew clean build -x test
+            nohup java -jar build/libs/focusing-0.0.1-SNAPSHOT.jar > /tmp/nohup.log 2>&1 &
