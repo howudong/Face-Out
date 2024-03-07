@@ -6,10 +6,10 @@ services:
       - $HOME/Face-Out/backend/volume/kurento:/data
     network_mode: host
     environment:
-      - KMS_STUN_IP=23.21.150.121
-      - KMS_STUN_PORT=3478
+      - KMS_STUN_IP:23.21.150.121
+      - KMS_STUN_PORT:3478
       - KMS_EXTERNAL_IPV4=3.39.179.45
-      - KMS_TURN_URL=192.158.29.39:3478
+      - KMS_TURN_URL:192.158.29.39:3478
   nginx:
     image: nginx:latest
     command: |
